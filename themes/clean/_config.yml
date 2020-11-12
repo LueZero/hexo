@@ -5,10 +5,10 @@
 menu_title: 
 
 # URL of the Home page image
-index_cover: /img/home-bg.jpg
+index_cover: /img/home-bg2.jpg
 
 # Set your own favicon
-favicon: /img/favicon.png
+favicon: /img/favicon2.png
 
 # Site start year
 # Default with current year
@@ -55,11 +55,9 @@ comments:
 footer:
   author:
   menu:
-    Home: /
-    Archives: /archives
-    Tags: /tags
-    Categories: /categories
-    About: /about
+    首頁: /
+    文章: /archives
+    關於: /about
   social_link:
     twitter_url:
     twitter_handle:
