@@ -57,7 +57,7 @@ footer:
   menu:
     首頁: /
     文章: /archives
-    關於: /about
+    # 關於: /about
   social_link:
     twitter_url:
     twitter_handle:
