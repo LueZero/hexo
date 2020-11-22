@@ -9,7 +9,7 @@
 
 
 
-    <meta name="description" content="菜鳥工程師👨‍💻第一篇日記&amp;nbsp;&amp;nbsp;大學畢業後馬上擔任網頁後端工程師，在職中也有繼續就讀碩士班，不斷充實自己，雖說年資不久但也經歷過許多大小事情，希望藉此透過部落格來撰寫工程師歷程心得:D。"/>
+    <meta name="description" content="前言&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;使用PHP語言時是不是覺得code的語法很簡單或是方便，比期編譯語言程式碼如JAVA、C#、C等個要來得簡單，但是隨著需求功能增加code份量就會增加，這時候就是朝向clean code方面去開發，但本章節不是探討clean code的而是程式碼簡"/>
 
 
 <!--Author-->
@@ -19,12 +19,12 @@
 
 <!--Open Graph Title-->
 
-    <meta property="og:title" content="菜鳥工程師👨‍💻"/>
+    <meta property="og:title" content="PHP 簡單寫法"/>
 
 
 <!--Open Graph Description-->
 
-    <meta property="og:description" content="菜鳥工程師👨‍💻第一篇日記&amp;nbsp;&amp;nbsp;大學畢業後馬上擔任網頁後端工程師，在職中也有繼續就讀碩士班，不斷充實自己，雖說年資不久但也經歷過許多大小事情，希望藉此透過部落格來撰寫工程師歷程心得:D。"/>
+    <meta property="og:description" content="前言&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;使用PHP語言時是不是覺得code的語法很簡單或是方便，比期編譯語言程式碼如JAVA、C#、C等個要來得簡單，但是隨著需求功能增加code份量就會增加，這時候就是朝向clean code方面去開發，但本章節不是探討clean code的而是程式碼簡"/>
 
 
 <!--Open Graph Site Name-->
@@ -51,7 +51,7 @@
 
 <!-- Title -->
 
-<title>菜鳥工程師👨‍💻 | zero</title>
+<title>PHP 簡單寫法 | zero</title>
 
 <!-- Bootstrap Core CSS -->
 <link rel="stylesheet" href="//cdn.jsdelivr.net/npm/bootstrap@4.4.1/dist/css/bootstrap.min.css">
@@ -120,7 +120,7 @@
         <div class="row">
             <div class="col-lg-12 col-md-12 text-center">
                 <div class="post-heading text-white">
-                    <h1>菜鳥工程師👨‍💻</h1>
+                    <h1>PHP 簡單寫法</h1>
                     
                 </div>
             </div>
@@ -140,7 +140,7 @@
         <i class="far fa-bookmark fa-fw"></i>
         
 
-<a href="/categories/%E9%83%A8%E8%90%BD%E6%A0%BC/">部落格</a>
+<a href="/categories/%E7%A8%8B%E5%BC%8F/">程式</a>
 
     
     
@@ -148,7 +148,7 @@
     
         <span class="post-meta-split">&nbsp;|&nbsp;</span>
         <i class="far fa-calendar-check fa-fw"></i>
-        2020-11-17
+        2020-11-15
     
     <!-- word count and read count -->
     
@@ -158,7 +158,12 @@
     
 </span>  
                 
-                <h1 id="菜鳥工程師👨‍💻"><a href="#菜鳥工程師👨‍💻" class="headerlink" title="菜鳥工程師👨‍💻"></a>菜鳥工程師👨‍💻</h1><h5 id="第一篇日記"><a href="#第一篇日記" class="headerlink" title="第一篇日記"></a>第一篇日記</h5><p>&nbsp;&nbsp;大學畢業後馬上擔任網頁後端工程師，在職中也有繼續就讀碩士班，不斷充實自己，雖說年資不久但也經歷過許多大小事情，希望藉此透過部落格來撰寫工程師歷程心得:D。</p>
+                <h4 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h4><p>&nbsp;&nbsp;&nbsp;&nbsp;使用PHP語言時是不是覺得code的語法很簡單或是方便，比期編譯語言程式碼如JAVA、C#、C等個要來得簡單，但是隨著需求功能增加code份量就會增加，這時候就是朝向clean code方面去開發，但本章節不是探討clean code的而是<strong>程式碼簡單寫法</strong>。</p>
+<h4 id="何謂簡單寫法"><a href="#何謂簡單寫法" class="headerlink" title="何謂簡單寫法"></a>何謂簡單寫法</h4><p>&nbsp;&nbsp;&nbsp;&nbsp;簡單寫法是一段程式碼從複雜到簡單，舉例來說條件式判斷常常占用到3行以上，下面這段條件式判斷，其實可以簡易條件式方式來縮短程式碼，來達到簡單程式碼。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">&#x2F;&#x2F; 複雜</span><br><span class="line">$food &#x3D; &quot;漢堡&quot;;</span><br><span class="line">$eat &#x3D; &quot;&quot;;</span><br><span class="line"></span><br><span class="line">if($food &#x3D;&#x3D; &quot;漢堡&quot;)</span><br><span class="line">&#123;</span><br><span class="line">    $eat &#x3D; &quot;開動&quot;;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">&#x2F;&#x2F; 簡單</span><br><span class="line">$food &#x3D; &quot;漢堡&quot;;</span><br><span class="line">$eat &#x3D; ($food &#x3D;&#x3D; &quot;漢堡&quot; ? &quot;開動&quot; : &quot;&quot;);</span><br></pre></td></tr></table></figure>
+<p>&nbsp;&nbsp;&nbsp;&nbsp;而如果是畫面上印出資料時需要透過echo or print，其實可以透過更簡短方式<?=$xxx; ?>直接印出來。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">$str &#x3D; &quot;Hello Word&quot;;</span><br><span class="line"></span><br><span class="line">&#x2F;&#x2F;複雜</span><br><span class="line">&lt;?php echo $str; ?&gt;</span><br><span class="line"></span><br><span class="line">&#x2F;&#x2F;簡單</span><br><span class="line">&lt;?&#x3D;$str; ?&gt;</span><br></pre></td></tr></table></figure>
+<p>&nbsp;&nbsp;&nbsp;&nbsp;小結:其實簡單寫法是為了讓複雜程式碼更簡單更好閱讀，雖說沒有一定準則但是能讓程式碼更短不是好嗎。</p>
 
             </div>
 
@@ -170,6 +175,8 @@
             
                 <li class="previous page-item d-inline"><a href="/2020/11/17/202011172350/" class="page-link float-left">&larr;  下一頁</a></li>
             
+            
+                <li class="next page-item d-inline"><a href="/2020/11/10/202011121830/" class="page-link float-right">上一頁  &rarr;</a></li>
             
         </ul>
     </div>
