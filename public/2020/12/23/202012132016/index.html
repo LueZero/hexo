@@ -9,7 +9,8 @@
 
 
 
-    <meta name="description" content="前言SQL的效能一直是DB工程師必須面對的主要課程之一，甚至有些人認為是唯一的課題。"/>
+    <meta name="description" content="前言SQL 的效能一直是 DB 工程師必須面對的主要課程之一，甚至有些人認為是唯一的課題。此章節是改善 SQL 的效能，讓執行速度更快減少更多資源。
+使用效率的搜尋若子查詢為參數使用(EXISTS)代替(IN)，在 IN 述詞很方便，也很好讀，但卻會遇到效能瓶頸的問題，若當 IN 參數(1,2,3)"/>
 
 
 <!--Author-->
@@ -24,7 +25,8 @@
 
 <!--Open Graph Description-->
 
-    <meta property="og:description" content="前言SQL的效能一直是DB工程師必須面對的主要課程之一，甚至有些人認為是唯一的課題。"/>
+    <meta property="og:description" content="前言SQL 的效能一直是 DB 工程師必須面對的主要課程之一，甚至有些人認為是唯一的課題。此章節是改善 SQL 的效能，讓執行速度更快減少更多資源。
+使用效率的搜尋若子查詢為參數使用(EXISTS)代替(IN)，在 IN 述詞很方便，也很好讀，但卻會遇到效能瓶頸的問題，若當 IN 參數(1,2,3)"/>
 
 
 <!--Open Graph Site Name-->
@@ -158,7 +160,112 @@
     
 </span>  
                 
-                <h4 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h4><p>SQL的效能一直是DB工程師必須面對的主要課程之一，甚至有些人認為是唯一的課題。</p>
+                <h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>SQL 的效能一直是 DB 工程師必須面對的主要課程之一，甚至有些人認為是唯一的課題。此章節是改善 SQL 的效能，讓執行速度更快減少更多資源。</p>
+<h2 id="使用效率的搜尋"><a href="#使用效率的搜尋" class="headerlink" title="使用效率的搜尋"></a>使用效率的搜尋</h2><h4 id="若子查詢為參數"><a href="#若子查詢為參數" class="headerlink" title="若子查詢為參數"></a>若子查詢為參數</h4><p>使用(EXISTS)代替(IN)，在 IN 述詞很方便，也很好讀，但卻會遇到效能瓶頸的問題，若當 IN 參數(1,2,3)這種 List 時繼就不需要改寫，但如果以子查詢為參數就必須要注意，通常 NOT IN 跟 NOT EXISTS 都是回傳相同的結果，但是使用 EXISTS 建立子查詢卻快的很多。</p>
+<p>Class_A<br>| id(識別子) |name (姓名) |<br>| ———-| ———— |<br>| 1 | 郁 |<br>| 2 | 瑋 |<br>| 3 | 銘 |</p>
+<p>Class_B<br>| id(識別子) | name(姓名) |<br>| ——— | ———— |<br>| 1 | 郁 |<br>| 2 | 瑋 |<br>| 4 | 靚 |</p>
+<p>試著從 Class_A 表找出 Class_B 資料表也有的學生。</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">較慢</span><br><span class="line"><span class="keyword">SELECT</span> * <span class="keyword">FROM</span> Class_A <span class="keyword">WHERE</span> <span class="keyword">id</span> ( <span class="keyword">SELECT</span> <span class="keyword">id</span> <span class="keyword">FROM</span> Class_B);</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">較快</span><br><span class="line"><span class="keyword">SELECT</span> * <span class="keyword">FROM</span> Class_A A <span class="keyword">WHERE</span> <span class="keyword">EXISTS</span> ( <span class="keyword">SELECT</span> <span class="keyword">id</span> <span class="keyword">FROM</span> Class_B B <span class="keyword">WHERE</span> A.id = B.id );</span><br></pre></td></tr></table></figure>
+
+<p>結果<br>| id(識別子) | name(姓名) |<br>| ——— | ———— |<br>| 1 | 郁 |<br>| 2 | 瑋 |</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">為什麼EXISTS會比較快？大致上有兩個理由。</span><br><span class="line">1.如果連結key帶有索引值，就可能直接按照索引值，不需觀察Class_B的資料表。</span><br><span class="line">2.EXISTS只要找到一筆符合的列，就會立刻停止搜尋，不會是IN得全面搜尋一遍。</span><br></pre></td></tr></table></figure>
+
+<h4 id="子查詢為參數時，使用連結代替-IN"><a href="#子查詢為參數時，使用連結代替-IN" class="headerlink" title="子查詢為參數時，使用連結代替 IN"></a>子查詢為參數時，使用連結代替 IN</h4><p>要改善 IN 的效能，除了使用 EXISTS 改寫，也可以利用連結方式去實現。</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">SELECT</span> Ａ.id,A.name <span class="keyword">FROM</span> Class_A A <span class="keyword">INNER</span> <span class="keyword">JOIN</span> Class_B B <span class="keyword">ON</span> A.id = B.id;</span><br></pre></td></tr></table></figure>
+
+<h2 id="避開排序"><a href="#避開排序" class="headerlink" title="避開排序"></a>避開排序</h2><p>SQL 與程式語言不同，使用者無法直接命令 DBMS 指定排序運算，不過這不代表 DBMS 不執行排序，更精準的說是 DBMS 非常頻繁的偷偷執行排序，也導致使用者不用去理會哪中運算正在執行排序。</p>
+<p>會執行排序如下 :</p>
+<pre><code>1.GROUP BY
+2.ORDER BY
+3.彙總函數(SUM、COUNT、AVG、MAX、MIN)
+4.DISTINCT
+5.UNION、INTERSECT、EXCEPT
+6.視窗函數(RANK ROW_NUMBER)</code></pre>
+<h4 id="善用集合運算的-ALL-選項"><a href="#善用集合運算的-ALL-選項" class="headerlink" title="善用集合運算的 ALL 選項"></a>善用集合運算的 ALL 選項</h4><p>SQL 具有 UNION、INTERSECT、EXCEPT 三種集合運算子，如果直接使用一定會為了排除重複資料而執行排序。</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">SELECT</span> * <span class="keyword">FROM</span> Class_A</span><br><span class="line"> <span class="keyword">UNION</span></span><br><span class="line"><span class="keyword">SELECT</span> * <span class="keyword">FROM</span> Class_B;</span><br></pre></td></tr></table></figure>
+
+<p>結果<br>| id(識別子) | name(姓名) |<br>| ——— | ———— |<br>| 1 | 郁 |<br>| 2 | 瑋 |<br>| 3 | 銘 |<br>| 4 | 靚 |</p>
+<p>如果不用在乎重複資料或事先知道不會有重複資料，可以利用 UNION ALL 代替，避免執行排序。</p>
+<h4 id="以-EXISTS-代替-DISTINCT"><a href="#以-EXISTS-代替-DISTINCT" class="headerlink" title="以 EXISTS 代替 DISTINCT"></a>以 EXISTS 代替 DISTINCT</h4><p>DISTINCT 也會為了排除重複資料而執行排序。若是為了統整兩張表連結結果而使用 DISTINCT 的情況，也可以使用 EXISTS 代替，也能避免執行排序。</p>
+<p>Items<br>| item_no|item |<br>| ———-| ———— |<br>| 10| SD 記憶卡 |<br>| 20 | CD-R |<br>| 30 | USB 隨身碟|<br>| 40 | DVD|</p>
+<p>SalesHistory<br>| sale_date | item_no | quantity |<br>| ——— | ———— | ———— |<br>| 2020-10-01 | 10 | 4 |<br>| 2020-10-01 | 20 | 10 |<br>| 2020-10-01 | 30 | 3 |<br>| 2020-10-03 | 10 | 32 |<br>| 2020-10-03 | 30 | 12 |<br>| 2020-10-04 | 20 | 22 |<br>| 2020-10-04 | 30 | 7 |</p>
+<p>根據上方商品主資料表選出業績表的商品，簡單說就是找出有業績的商品，此時書中說使用 IN 雖然不錯但知前面提到用連結會更好。</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">SELECT</span> I.item_no <span class="keyword">FROM</span> Items I <span class="keyword">INNER</span> <span class="keyword">JOIN</span> SalesHistory SH <span class="keyword">ON</span> I.item_no = SH.item_no;</span><br></pre></td></tr></table></figure>
+
+<p>結果<br>| item_no |<br>| ——— |<br>| 10|<br>| 10|<br>| 20|<br>| 20|<br>| 30|<br>| 30|<br>| 30|</p>
+<p>於是一對多連結，就會出現重複資料，若要將重複資料排除勢必使用DISTINCT那這樣就會執行到排序，所以書中說到最佳解答是使用EXISTS，如此一來就不會執行排序。</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">SELECT</span> item_no <span class="keyword">FROM</span> Items I <span class="keyword">WHERE</span> <span class="keyword">EXISTS</span>(</span><br><span class="line">    <span class="keyword">SELECT</span> * <span class="keyword">FROM</span> SalesHistory SH <span class="keyword">WHERE</span> I.item_no = SH.item_no</span><br><span class="line">);</span><br></pre></td></tr></table></figure>
+
+<h2 id="於極值函數-MAX-MIN-使用索引值"><a href="#於極值函數-MAX-MIN-使用索引值" class="headerlink" title="於極值函數(MAX/MIN)使用索引值"></a>於極值函數(MAX/MIN)使用索引值</h2><p>SQL內建MAX跟MIN函數，使用時都會進行排序，但如果參數欄位已有索引值，就只需要掃描到該索引值，不需要搜尋整張表。</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">這段會需要搜尋整張表格</span><br><span class="line"> <span class="keyword">SELECT</span> <span class="keyword">MAX</span>(item) <span class="keyword">FROM</span> Items</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">這段可以使用到索引值</span><br><span class="line"> <span class="keyword">SELECT</span> <span class="keyword">MAX</span>(item_no) <span class="keyword">FROM</span> Items</span><br></pre></td></tr></table></figure>
+
+<p>由於item_no主鍵的索引值，所以效果更好，即時是複合索引值，只要有首欄位就能使用。雖然這種做法無法真的不排序，但至少可讓前半段搜尋變快，也能提高效率。</p>
+<h2 id="寫在WHERE的條件不寫在HAVING上"><a href="#寫在WHERE的條件不寫在HAVING上" class="headerlink" title="寫在WHERE的條件不寫在HAVING上"></a>寫在WHERE的條件不寫在HAVING上</h2><figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">SELECT</span> sale_date, <span class="keyword">SUM</span>(quantity)</span><br><span class="line"><span class="keyword">FROM</span> SalesHistory </span><br><span class="line"><span class="keyword">GROUP</span> <span class="keyword">BY</span> sale_date <span class="keyword">HAVING</span> sale_date = <span class="string">&#x27;2007-10-01&#x27;</span>;</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">SELECT</span> sale_date, <span class="keyword">SUM</span>(quantity)</span><br><span class="line"><span class="keyword">FROM</span> SalesHistory sale_date = <span class="string">&#x27;2007-10-01&#x27;</span></span><br><span class="line"><span class="keyword">GROUP</span> <span class="keyword">BY</span> sale_date;</span><br></pre></td></tr></table></figure>
+
+<p>結果<br>| sale_date | sum(quantity)|<br>| ——— | —–<br>| 2007-10-01 | 17 |</p>
+<p>從效能來看一定是後者，原因是第一個使用GROUP BY之後彙整進行排序與運算，所以減少列數，才能減輕排序時負擔。第二個就是WHERE條件可使用索引值。某種意義上，sale_date應該是基數非常高的欄位，所以只要有索引值，應該就能讓列數有效率減少。</p>
+<h4 id="GROUP-BY-以及-ORDER-BY使用索引值"><a href="#GROUP-BY-以及-ORDER-BY使用索引值" class="headerlink" title="GROUP BY 以及 ORDER BY使用索引值"></a>GROUP BY 以及 ORDER BY使用索引值</h4><p>這兩種方式雖然會執行排序，但只要在欄位上加上索引值，就能讓搜尋速度變快，尤其是UNIQUE索引值欄位，有些系統的規格更是能跳過排序。</p>
+<h2 id="索引值真的派得上用場嗎"><a href="#索引值真的派得上用場嗎" class="headerlink" title="索引值真的派得上用場嗎?"></a>索引值真的派得上用場嗎?</h2><p>一般來說資料表有一定規模後，通常就會有索引值。把索引值想像成C語言的指標陣列，意思就是比起搜尋規模較大的物件，搜尋較小的指標會更有效率。</p>
+<h4 id="加工索引值欄位"><a href="#加工索引值欄位" class="headerlink" title="加工索引值欄位"></a>加工索引值欄位</h4><figure class="highlight"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">SELECT</span> * <span class="keyword">FROM</span> SomeTable <span class="keyword">WHERE</span> col_1 * <span class="number">1.1</span> &gt; <span class="number">100</span>;</span><br><span class="line"></span><br><span class="line">WHERE col_1 &gt; 100 / 1.1</span><br></pre></td></tr></table></figure>
+
+<p>若於搜尋條件右側使用公式，就會用到索引值。因此可以改成下列方式。同樣的在左側使用函數就無法使用到索引值。</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">SELECT</span> * <span class="keyword">FROM</span> SomeTable <span class="keyword">WHERE</span> <span class="keyword">SUBSTR</span>(col_1, <span class="number">1</span>, <span class="number">1</span>) = <span class="string">&#x27;a&#x27;</span>;</span><br></pre></td></tr></table></figure>
+
+<p>如果非要左邊進行運算，書中說到可以用函數索引，但這種方式很麻煩也不太建議。</p>
+<pre><code> 使用索引值時候，欄位最好是乾淨的。</code></pre>
+<h4 id="索引值欄位有NULL"><a href="#索引值欄位有NULL" class="headerlink" title="索引值欄位有NULL"></a>索引值欄位有NULL</h4><p>索引值有NULL是很難處理的，而且不同規格有不同處理的方式，這也是因為受到使用者使用IS NULL或是IS NOT NULL，<br>就無法使用索引值，或是NULL偏多的欄位無法使用索引的限制導致。此外該如何與IS NOT NULL同等條件使用索引值，可以使用下列方式</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">IS NOT NULL 替代方案</span><br><span class="line"><span class="keyword">SELECT</span> * <span class="keyword">FROM</span> SomeTable <span class="keyword">WHERE</span> col_1 &gt; <span class="number">0</span>;</span><br></pre></td></tr></table></figure>
+
+<h4 id="使用否定型的情況"><a href="#使用否定型的情況" class="headerlink" title="使用否定型的情況"></a>使用否定型的情況</h4><p>列出否定型不會使用索引值</p>
+<ul>
+<li>&lt;&gt;</li>
+<li>!=</li>
+<li>NOT IN</li>
+</ul>
+<p>因此下列程式也無法取使用索引值。</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">SELECT</span> * <span class="keyword">FROM</span> SomeTable <span class="keyword">WHERE</span> col_1 &lt;&gt; <span class="number">100</span>;</span><br></pre></td></tr></table></figure>
+
+<h4 id="使用OR的情況"><a href="#使用OR的情況" class="headerlink" title="使用OR的情況"></a>使用OR的情況</h4><p>假設col_1與col_2各有索引值情況，或者col_1,col_2有複合索引，使OR撰寫連結條件，就無法使用索引值，而且就算可以使用，搜尋效率也會比AND差。</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">SELECT</span> * <span class="keyword">FROM</span> SomeTable <span class="keyword">WHERE</span> col_1 &gt; <span class="number">1</span> <span class="keyword">OR</span> col_2 = <span class="string">&#x27;abc&#x27;</span>;</span><br></pre></td></tr></table></figure>
+
+<h4 id="再複合索引下，欄位順序是錯誤的"><a href="#再複合索引下，欄位順序是錯誤的" class="headerlink" title="再複合索引下，欄位順序是錯誤的"></a>再複合索引下，欄位順序是錯誤的</h4><p>假設以(col_1,col_2,col_3)這個順序下建立索引值，建立索引值欄位順序就相對重要。</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">O <span class="keyword">SELECT</span> * <span class="keyword">FROM</span> SomeTable <span class="keyword">WHERE</span> col_1 ＝ <span class="number">10</span> <span class="keyword">AND</span> col_2 = <span class="number">100</span> <span class="keyword">AND</span> col_3 = <span class="number">500</span>;</span><br><span class="line">O <span class="keyword">SELECT</span> * <span class="keyword">FROM</span> SomeTable <span class="keyword">WHERE</span> col_1 ＝ <span class="number">10</span> <span class="keyword">AND</span> col_2 = <span class="number">100</span>;</span><br><span class="line">X <span class="keyword">SELECT</span> * <span class="keyword">FROM</span> SomeTable <span class="keyword">WHERE</span> col_1 ＝ <span class="number">10</span> <span class="keyword">AND</span> col_3 = <span class="number">500</span>;</span><br><span class="line">X <span class="keyword">SELECT</span> * <span class="keyword">FROM</span> SomeTable <span class="keyword">WHERE</span> col_2 ＝ <span class="number">100</span> <span class="keyword">AND</span> col_3 = <span class="number">500</span>;</span><br></pre></td></tr></table></figure>
+
+<p>第一個欄位一定寫在開頭，順序不能錯亂。某些DB雖然可能順序錯誤情況也可以使用索引值，但是效能還是比順序正確時來得低。</p>
+<h4 id="使用後方一致或中間一致的LIKE"><a href="#使用後方一致或中間一致的LIKE" class="headerlink" title="使用後方一致或中間一致的LIKE"></a>使用後方一致或中間一致的LIKE</h4><figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">X <span class="keyword">SELECT</span> * <span class="keyword">FROM</span> SomeTable <span class="keyword">WHERE</span> col_1 <span class="keyword">LIKE</span> <span class="string">&#x27;%10&#x27;</span> ;</span><br><span class="line">X <span class="keyword">SELECT</span> * <span class="keyword">FROM</span> SomeTable <span class="keyword">WHERE</span> col_1 <span class="keyword">LIKE</span> <span class="string">&#x27;%10&#x27;</span> ;</span><br><span class="line">O <span class="keyword">SELECT</span> * <span class="keyword">FROM</span> SomeTable <span class="keyword">WHERE</span> col_1 <span class="keyword">LIKE</span> <span class="string">&#x27;10%&#x27;</span> ;</span><br></pre></td></tr></table></figure>
+
+<h4 id="會進行預設型態轉換"><a href="#會進行預設型態轉換" class="headerlink" title="會進行預設型態轉換"></a>會進行預設型態轉換</h4><p>下列是對字串類型的col_1設定條件的情況。</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">X <span class="keyword">SELECT</span> * <span class="keyword">FROM</span> SomeTable <span class="keyword">WHERE</span> col_1 = <span class="number">10</span> ;</span><br><span class="line">O <span class="keyword">SELECT</span> * <span class="keyword">FROM</span> SomeTable <span class="keyword">WHERE</span> col_1 = <span class="string">&#x27;10&#x27;</span> ;</span><br><span class="line">O <span class="keyword">SELECT</span> * <span class="keyword">FROM</span> SomeTable <span class="keyword">WHERE</span> col_1 = <span class="keyword">CAST</span>(<span class="number">10</span>,<span class="keyword">AS</span> <span class="built_in">CHAR</span>(<span class="number">2</span>));</span><br></pre></td></tr></table></figure>
+
+<h2 id="減少中介資料表"><a href="#減少中介資料表" class="headerlink" title="減少中介資料表"></a>減少中介資料表</h2><p>SQL會將子查詢結果為新的資料表，也能在程式碼裡，像是操作原始資料表一般操作。這種高正交性讓SQL程式碼更加靈活，但若是大量使用中介資料也會造成性能下滑，所以盡可能減少中介資料。</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">SELECT</span> * <span class="keyword">FROM</span>(</span><br><span class="line">     <span class="keyword">SELECT</span> sale_date, <span class="keyword">MAX</span>(quantity) <span class="keyword">AS</span> max_qty <span class="keyword">FROM</span> SalesHistory <span class="keyword">GROUP</span> <span class="keyword">BY</span> sale_date</span><br><span class="line">) TMP  &lt;-多餘的中介資料</span><br><span class="line"><span class="keyword">WHERE</span> max_qty &gt;= <span class="number">10</span>;</span><br></pre></td></tr></table></figure>
+
+<p>不過，要將彙整的結果設定條件，是不需要建立多餘中介資料，只需要使用下列HAVING陳述句。</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">SELECT</span> sale_date, <span class="keyword">MAX</span>(quantity) <span class="keyword">AS</span> max_qty <span class="keyword">FROM</span> SalesHistory <span class="keyword">GROUP</span> <span class="keyword">BY</span> sale_date <span class="keyword">HAVING</span> <span class="keyword">MAX</span>(quantity) &gt;= <span class="number">10</span>;</span><br></pre></td></tr></table></figure>
+<p>HAVING會一邊執行，一邊進行彙整，所以會比建立中介資料表之後才執行WHERE更有效率，且可讀性比較好。</p>
+<h2 id="利用IN使用多個KEY時，將KEY整理在同一個位置"><a href="#利用IN使用多個KEY時，將KEY整理在同一個位置" class="headerlink" title="利用IN使用多個KEY時，將KEY整理在同一個位置"></a>利用IN使用多個KEY時，將KEY整理在同一個位置</h2><p>自從SQL-92之後，就內建許多列間比較的功能，所以=、&lt;、&gt;這類比較或IN的參數不僅可以是純量，還能是LIST。讓我們想想下列這種使用多個Key組成IN內容情況。</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">SELECT</span> <span class="keyword">id</span>, state, city <span class="keyword">FROM</span> Address1 A1 </span><br><span class="line"><span class="keyword">WHERE</span> </span><br><span class="line"><span class="keyword">status</span> <span class="keyword">IN</span>(</span><br><span class="line">    <span class="keyword">SELECT</span> <span class="keyword">status</span> <span class="keyword">FROM</span> Address2 A2 <span class="keyword">WHERE</span> A1.id = A2.id      </span><br><span class="line">) <span class="keyword">AND</span> city <span class="keyword">IN</span> (</span><br><span class="line">    <span class="keyword">SELECT</span> city <span class="keyword">FROM</span> Address2 A2 <span class="keyword">WHERE</span> A1.id = A2.id      </span><br><span class="line">)</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">SELECT</span> * <span class="keyword">FROM</span> Address1 A1 <span class="keyword">WHERE</span> <span class="keyword">id</span> || <span class="keyword">status</span> || city <span class="keyword">IN</span>(</span><br><span class="line">    <span class="keyword">SELECT</span> <span class="keyword">id</span> || state || city <span class="keyword">FROM</span> Address1 A2);</span><br><span class="line">)</span><br></pre></td></tr></table></figure>
+
+<p>如此一來既可將子查詢寫成非關聯式類型，還能將搜尋減少為一次，如果是支援列間比較DB，還能如下在IN的參數設定欄位組合。</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">SELECT</span> * <span class="keyword">FROM</span> Address1 A1 <span class="keyword">WHERE</span> (<span class="keyword">id</span>, <span class="keyword">status</span>, city) <span class="keyword">IN</span>(</span><br><span class="line">    <span class="keyword">SELECT</span> <span class="keyword">id</span> , state , city <span class="keyword">FROM</span> Address1 A2);</span><br><span class="line">)</span><br></pre></td></tr></table></figure>
+
+<p>相較於合併字串，這個方法有兩個優點。其一是不用擔心連結的類型轉換，另一個需要加工欄位，所以可使用索引值。</p>
+<h2 id="先連結在彙整"><a href="#先連結在彙整" class="headerlink" title="先連結在彙整"></a>先連結在彙整</h2><p>當需要連結使用，盡可能先連結在彙整，才能省去建立中介資料的步驟。之所以能夠省略，全在於集合運算的連結屬於乘法，若具一對一或是一對多的關聯性<br>，列數不會在連結之際增加。</p>
+<h2 id="計畫性地使用視圖"><a href="#計畫性地使用視圖" class="headerlink" title="計畫性地使用視圖"></a>計畫性地使用視圖</h2><p>視圖是非常方便的工具，但如果隨便訂了複雜的視圖將使效能下降，尤其定義是圖的查詢含有下列運算時，SQL的效率將變得更差，執行速度也會出乎意料的下滑。</p>
+<h4 id="總結"><a href="#總結" class="headerlink" title="總結"></a>總結</h4><pre><code>1.在IN使用子查詢，可以利用EXISTS或改寫連結。
+2.使用索引值，基本上左邊是空白的。
+3.SQＬ雖然不需要明定排序部分，但有許多運算會偷偷執行排序，需多加留意。
+4.盡可能減少不需要的中介資料。
+5.趁早撰寫能減少紀錄筆數的條件。</code></pre>
+<p>參考資料: SQL 達人的工作現場攻略筆記</p>
 
             </div>
 
@@ -169,7 +276,7 @@
         <ul class="pagination d-block text-center">
             
             
-                <li class="next page-item d-inline"><a href="/2020/12/22/googleappscript/" class="page-link float-right">上一頁  &rarr;</a></li>
+                <li class="next page-item d-inline"><a href="/2020/12/22/Line%E5%AE%98%E6%96%B9%E7%B6%B2%E7%AB%9901/" class="page-link float-right">上一頁  &rarr;</a></li>
             
         </ul>
     </div>
@@ -281,7 +388,7 @@
                     
                 </ul>
                 <p class="copyright footer-author">
-                    &copy; -2020 
+                    &copy; -2021 
                     <a rel="external" class="copyright-link" href="" target="_blank">luezero</a><br/>
                     Powered by <a rel="external" class="copyright-link" href="https://hexo.io/" target="_blank">Hexo</a>  
                     <span class="copyright-split">&nbsp;|&nbsp;&nbsp;</span>
