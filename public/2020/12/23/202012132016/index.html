@@ -20,7 +20,7 @@
 
 <!--Open Graph Title-->
 
-    <meta property="og:title" content="SQL 達人的工作現場攻略筆記 - CH-11 要讓SQL加入囉"/>
+    <meta property="og:title" content="SQL 達人的工作現場攻略筆記 - CH-11 要讓SQL加速囉"/>
 
 
 <!--Open Graph Description-->
@@ -53,7 +53,7 @@
 
 <!-- Title -->
 
-<title>SQL 達人的工作現場攻略筆記 - CH-11 要讓SQL加入囉 | zero</title>
+<title>SQL 達人的工作現場攻略筆記 - CH-11 要讓SQL加速囉 | zero</title>
 
 <!-- Bootstrap Core CSS -->
 <link rel="stylesheet" href="//cdn.jsdelivr.net/npm/bootstrap@4.4.1/dist/css/bootstrap.min.css">
@@ -122,7 +122,7 @@
         <div class="row">
             <div class="col-lg-12 col-md-12 text-center">
                 <div class="post-heading text-white">
-                    <h1>SQL 達人的工作現場攻略筆記 - CH-11 要讓SQL加入囉</h1>
+                    <h1>SQL 達人的工作現場攻略筆記 - CH-11 要讓SQL加速囉</h1>
                     
                 </div>
             </div>
@@ -162,14 +162,73 @@
                 
                 <h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>SQL 的效能一直是 DB 工程師必須面對的主要課程之一，甚至有些人認為是唯一的課題。此章節是改善 SQL 的效能，讓執行速度更快減少更多資源。</p>
 <h2 id="使用效率的搜尋"><a href="#使用效率的搜尋" class="headerlink" title="使用效率的搜尋"></a>使用效率的搜尋</h2><h4 id="若子查詢為參數"><a href="#若子查詢為參數" class="headerlink" title="若子查詢為參數"></a>若子查詢為參數</h4><p>使用(EXISTS)代替(IN)，在 IN 述詞很方便，也很好讀，但卻會遇到效能瓶頸的問題，若當 IN 參數(1,2,3)這種 List 時繼就不需要改寫，但如果以子查詢為參數就必須要注意，通常 NOT IN 跟 NOT EXISTS 都是回傳相同的結果，但是使用 EXISTS 建立子查詢卻快的很多。</p>
-<p>Class_A<br>| id(識別子) |name (姓名) |<br>| ———-| ———— |<br>| 1 | 郁 |<br>| 2 | 瑋 |<br>| 3 | 銘 |</p>
-<p>Class_B<br>| id(識別子) | name(姓名) |<br>| ——— | ———— |<br>| 1 | 郁 |<br>| 2 | 瑋 |<br>| 4 | 靚 |</p>
+<p>Class_A</p>
+<div class="table-responsive">
+<table class="table table-bordered table-striped">
+<thead>
+<tr>
+<th>id(識別子)</th>
+<th>name (姓名)</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>1</td>
+<td>郁</td>
+</tr>
+<tr>
+<td>2</td>
+<td>瑋</td>
+</tr>
+<tr>
+<td>3</td>
+<td>銘</td>
+</tr>
+</tbody></table>
+<p>Class_B</p>
+<div class="table-responsive">
+<table class="table table-bordered table-striped">
+<thead>
+<tr>
+<th>id(識別子)</th>
+<th>name(姓名)</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>1</td>
+<td>郁</td>
+</tr>
+<tr>
+<td>2</td>
+<td>瑋</td>
+</tr>
+<tr>
+<td>4</td>
+<td>靚</td>
+</tr>
+</tbody></table>
 <p>試著從 Class_A 表找出 Class_B 資料表也有的學生。</p>
 <figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">較慢</span><br><span class="line"><span class="keyword">SELECT</span> * <span class="keyword">FROM</span> Class_A <span class="keyword">WHERE</span> <span class="keyword">id</span> ( <span class="keyword">SELECT</span> <span class="keyword">id</span> <span class="keyword">FROM</span> Class_B);</span><br></pre></td></tr></table></figure>
 
 <figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">較快</span><br><span class="line"><span class="keyword">SELECT</span> * <span class="keyword">FROM</span> Class_A A <span class="keyword">WHERE</span> <span class="keyword">EXISTS</span> ( <span class="keyword">SELECT</span> <span class="keyword">id</span> <span class="keyword">FROM</span> Class_B B <span class="keyword">WHERE</span> A.id = B.id );</span><br></pre></td></tr></table></figure>
 
-<p>結果<br>| id(識別子) | name(姓名) |<br>| ——— | ———— |<br>| 1 | 郁 |<br>| 2 | 瑋 |</p>
+<p>結果</p>
+<div class="table-responsive">
+<table class="table table-bordered table-striped">
+<thead>
+<tr>
+<th>id(識別子)</th>
+<th>name(姓名)</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>1</td>
+<td>郁</td>
+</tr>
+<tr>
+<td>2</td>
+<td>瑋</td>
+</tr>
+</tbody></table>
 <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">為什麼EXISTS會比較快？大致上有兩個理由。</span><br><span class="line">1.如果連結key帶有索引值，就可能直接按照索引值，不需觀察Class_B的資料表。</span><br><span class="line">2.EXISTS只要找到一筆符合的列，就會立刻停止搜尋，不會是IN得全面搜尋一遍。</span><br></pre></td></tr></table></figure>
 
 <h4 id="子查詢為參數時，使用連結代替-IN"><a href="#子查詢為參數時，使用連結代替-IN" class="headerlink" title="子查詢為參數時，使用連結代替 IN"></a>子查詢為參數時，使用連結代替 IN</h4><p>要改善 IN 的效能，除了使用 EXISTS 改寫，也可以利用連結方式去實現。</p>
@@ -186,15 +245,139 @@
 <h4 id="善用集合運算的-ALL-選項"><a href="#善用集合運算的-ALL-選項" class="headerlink" title="善用集合運算的 ALL 選項"></a>善用集合運算的 ALL 選項</h4><p>SQL 具有 UNION、INTERSECT、EXCEPT 三種集合運算子，如果直接使用一定會為了排除重複資料而執行排序。</p>
 <figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">SELECT</span> * <span class="keyword">FROM</span> Class_A</span><br><span class="line"> <span class="keyword">UNION</span></span><br><span class="line"><span class="keyword">SELECT</span> * <span class="keyword">FROM</span> Class_B;</span><br></pre></td></tr></table></figure>
 
-<p>結果<br>| id(識別子) | name(姓名) |<br>| ——— | ———— |<br>| 1 | 郁 |<br>| 2 | 瑋 |<br>| 3 | 銘 |<br>| 4 | 靚 |</p>
+<p>結果</p>
+<div class="table-responsive">
+<table class="table table-bordered table-striped">
+<thead>
+<tr>
+<th>id(識別子)</th>
+<th>name(姓名)</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>1</td>
+<td>郁</td>
+</tr>
+<tr>
+<td>2</td>
+<td>瑋</td>
+</tr>
+<tr>
+<td>3</td>
+<td>銘</td>
+</tr>
+<tr>
+<td>4</td>
+<td>靚</td>
+</tr>
+</tbody></table>
 <p>如果不用在乎重複資料或事先知道不會有重複資料，可以利用 UNION ALL 代替，避免執行排序。</p>
 <h4 id="以-EXISTS-代替-DISTINCT"><a href="#以-EXISTS-代替-DISTINCT" class="headerlink" title="以 EXISTS 代替 DISTINCT"></a>以 EXISTS 代替 DISTINCT</h4><p>DISTINCT 也會為了排除重複資料而執行排序。若是為了統整兩張表連結結果而使用 DISTINCT 的情況，也可以使用 EXISTS 代替，也能避免執行排序。</p>
-<p>Items<br>| item_no|item |<br>| ———-| ———— |<br>| 10| SD 記憶卡 |<br>| 20 | CD-R |<br>| 30 | USB 隨身碟|<br>| 40 | DVD|</p>
-<p>SalesHistory<br>| sale_date | item_no | quantity |<br>| ——— | ———— | ———— |<br>| 2020-10-01 | 10 | 4 |<br>| 2020-10-01 | 20 | 10 |<br>| 2020-10-01 | 30 | 3 |<br>| 2020-10-03 | 10 | 32 |<br>| 2020-10-03 | 30 | 12 |<br>| 2020-10-04 | 20 | 22 |<br>| 2020-10-04 | 30 | 7 |</p>
+<p>Items</p>
+<div class="table-responsive">
+<table class="table table-bordered table-striped">
+<thead>
+<tr>
+<th>item_no</th>
+<th>item</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>10</td>
+<td>SD 記憶卡</td>
+</tr>
+<tr>
+<td>20</td>
+<td>CD-R</td>
+</tr>
+<tr>
+<td>30</td>
+<td>USB 隨身碟</td>
+</tr>
+<tr>
+<td>40</td>
+<td>DVD</td>
+</tr>
+</tbody></table>
+<p>SalesHistory</p>
+<div class="table-responsive">
+<table class="table table-bordered table-striped">
+<thead>
+<tr>
+<th>sale_date</th>
+<th>item_no</th>
+<th>quantity</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>2020-10-01</td>
+<td>10</td>
+<td>4</td>
+</tr>
+<tr>
+<td>2020-10-01</td>
+<td>20</td>
+<td>10</td>
+</tr>
+<tr>
+<td>2020-10-01</td>
+<td>30</td>
+<td>3</td>
+</tr>
+<tr>
+<td>2020-10-03</td>
+<td>10</td>
+<td>32</td>
+</tr>
+<tr>
+<td>2020-10-03</td>
+<td>30</td>
+<td>12</td>
+</tr>
+<tr>
+<td>2020-10-04</td>
+<td>20</td>
+<td>22</td>
+</tr>
+<tr>
+<td>2020-10-04</td>
+<td>30</td>
+<td>7</td>
+</tr>
+</tbody></table>
 <p>根據上方商品主資料表選出業績表的商品，簡單說就是找出有業績的商品，此時書中說使用 IN 雖然不錯但知前面提到用連結會更好。</p>
 <figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">SELECT</span> I.item_no <span class="keyword">FROM</span> Items I <span class="keyword">INNER</span> <span class="keyword">JOIN</span> SalesHistory SH <span class="keyword">ON</span> I.item_no = SH.item_no;</span><br></pre></td></tr></table></figure>
 
-<p>結果<br>| item_no |<br>| ——— |<br>| 10|<br>| 10|<br>| 20|<br>| 20|<br>| 30|<br>| 30|<br>| 30|</p>
+<p>結果</p>
+<div class="table-responsive">
+<table class="table table-bordered table-striped">
+<thead>
+<tr>
+<th>item_no</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>10</td>
+</tr>
+<tr>
+<td>10</td>
+</tr>
+<tr>
+<td>20</td>
+</tr>
+<tr>
+<td>20</td>
+</tr>
+<tr>
+<td>30</td>
+</tr>
+<tr>
+<td>30</td>
+</tr>
+<tr>
+<td>30</td>
+</tr>
+</tbody></table>
 <p>於是一對多連結，就會出現重複資料，若要將重複資料排除勢必使用DISTINCT那這樣就會執行到排序，所以書中說到最佳解答是使用EXISTS，如此一來就不會執行排序。</p>
 <figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">SELECT</span> item_no <span class="keyword">FROM</span> Items I <span class="keyword">WHERE</span> <span class="keyword">EXISTS</span>(</span><br><span class="line">    <span class="keyword">SELECT</span> * <span class="keyword">FROM</span> SalesHistory SH <span class="keyword">WHERE</span> I.item_no = SH.item_no</span><br><span class="line">);</span><br></pre></td></tr></table></figure>
 
@@ -208,7 +391,20 @@
 
 <figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">SELECT</span> sale_date, <span class="keyword">SUM</span>(quantity)</span><br><span class="line"><span class="keyword">FROM</span> SalesHistory sale_date = <span class="string">&#x27;2007-10-01&#x27;</span></span><br><span class="line"><span class="keyword">GROUP</span> <span class="keyword">BY</span> sale_date;</span><br></pre></td></tr></table></figure>
 
-<p>結果<br>| sale_date | sum(quantity)|<br>| ——— | —–<br>| 2007-10-01 | 17 |</p>
+<p>結果</p>
+<div class="table-responsive">
+<table class="table table-bordered table-striped">
+<thead>
+<tr>
+<th>sale_date</th>
+<th>sum(quantity)</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>2007-10-01</td>
+<td>17</td>
+</tr>
+</tbody></table>
 <p>從效能來看一定是後者，原因是第一個使用GROUP BY之後彙整進行排序與運算，所以減少列數，才能減輕排序時負擔。第二個就是WHERE條件可使用索引值。某種意義上，sale_date應該是基數非常高的欄位，所以只要有索引值，應該就能讓列數有效率減少。</p>
 <h4 id="GROUP-BY-以及-ORDER-BY使用索引值"><a href="#GROUP-BY-以及-ORDER-BY使用索引值" class="headerlink" title="GROUP BY 以及 ORDER BY使用索引值"></a>GROUP BY 以及 ORDER BY使用索引值</h4><p>這兩種方式雖然會執行排序，但只要在欄位上加上索引值，就能讓搜尋速度變快，尤其是UNIQUE索引值欄位，有些系統的規格更是能跳過排序。</p>
 <h2 id="索引值真的派得上用場嗎"><a href="#索引值真的派得上用場嗎" class="headerlink" title="索引值真的派得上用場嗎?"></a>索引值真的派得上用場嗎?</h2><p>一般來說資料表有一定規模後，通常就會有索引值。把索引值想像成C語言的指標陣列，意思就是比起搜尋規模較大的物件，搜尋較小的指標會更有效率。</p>
