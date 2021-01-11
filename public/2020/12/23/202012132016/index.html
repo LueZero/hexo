@@ -408,6 +408,17 @@
 <p>從效能來看一定是後者，原因是第一個使用GROUP BY之後彙整進行排序與運算，所以減少列數，才能減輕排序時負擔。第二個就是WHERE條件可使用索引值。某種意義上，sale_date應該是基數非常高的欄位，所以只要有索引值，應該就能讓列數有效率減少。</p>
 <h4 id="GROUP-BY-以及-ORDER-BY使用索引值"><a href="#GROUP-BY-以及-ORDER-BY使用索引值" class="headerlink" title="GROUP BY 以及 ORDER BY使用索引值"></a>GROUP BY 以及 ORDER BY使用索引值</h4><p>這兩種方式雖然會執行排序，但只要在欄位上加上索引值，就能讓搜尋速度變快，尤其是UNIQUE索引值欄位，有些系統的規格更是能跳過排序。</p>
 <h2 id="索引值真的派得上用場嗎"><a href="#索引值真的派得上用場嗎" class="headerlink" title="索引值真的派得上用場嗎?"></a>索引值真的派得上用場嗎?</h2><p>一般來說資料表有一定規模後，通常就會有索引值。把索引值想像成C語言的指標陣列，意思就是比起搜尋規模較大的物件，搜尋較小的指標會更有效率。</p>
+<pre><code>1.不是索引越多越好，索引可以加快查詢速度，但注意它是以空間換取時間。
+
+2.懂的使用Explain來分析你的SQL索引性能解析，https://segmentfault.com/a/1190000008131735。
+
+3.索引不是建了就會使用。SELECT * FROM user WHERE sex = 0 ( 0 代表女生 )，答案是不一定，如果大部份的值都是女生，那 mysql 會用全掃，如果大部份值為男生，那 mysql 會用索引。
+
+4.連合索引的欄位順序，通常是由最左邊的欄位的才能使用。
+
+5.儘可能使用索引的排序。
+
+6.有時太多索引，反而會讓優化器混亂。</code></pre>
 <h4 id="加工索引值欄位"><a href="#加工索引值欄位" class="headerlink" title="加工索引值欄位"></a>加工索引值欄位</h4><figure class="highlight"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">SELECT</span> * <span class="keyword">FROM</span> SomeTable <span class="keyword">WHERE</span> col_1 * <span class="number">1.1</span> &gt; <span class="number">100</span>;</span><br><span class="line"></span><br><span class="line">WHERE col_1 &gt; 100 / 1.1</span><br></pre></td></tr></table></figure>
 
 <p>若於搜尋條件右側使用公式，就會用到索引值。因此可以改成下列方式。同樣的在左側使用函數就無法使用到索引值。</p>
@@ -461,7 +472,8 @@
 3.SQＬ雖然不需要明定排序部分，但有許多運算會偷偷執行排序，需多加留意。
 4.盡可能減少不需要的中介資料。
 5.趁早撰寫能減少紀錄筆數的條件。</code></pre>
-<p>參考資料: SQL 達人的工作現場攻略筆記</p>
+<p>參考資料: </p>
+<p>1.SQL 達人的工作現場攻略筆<br>2.<a target="_blank" rel="noopener" href="https://ithelp.ithome.com.tw/articles/10221971">https://ithelp.ithome.com.tw/articles/10221971</a></p>
 
             </div>
 
