@@ -207,7 +207,7 @@
 </tr>
 </tbody></table>
 <p>試著從 Class_A 表找出 Class_B 資料表也有的學生。</p>
-<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">較慢</span><br><span class="line"><span class="keyword">SELECT</span> * <span class="keyword">FROM</span> Class_A <span class="keyword">WHERE</span> <span class="keyword">id</span> ( <span class="keyword">SELECT</span> <span class="keyword">id</span> <span class="keyword">FROM</span> Class_B);</span><br></pre></td></tr></table></figure>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">較慢</span><br><span class="line"><span class="keyword">SELECT</span> * <span class="keyword">FROM</span> Class_A <span class="keyword">WHERE</span> <span class="keyword">id</span> <span class="keyword">IN</span> ( <span class="keyword">SELECT</span> <span class="keyword">id</span> <span class="keyword">FROM</span> Class_B);</span><br></pre></td></tr></table></figure>
 
 <figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">較快</span><br><span class="line"><span class="keyword">SELECT</span> * <span class="keyword">FROM</span> Class_A A <span class="keyword">WHERE</span> <span class="keyword">EXISTS</span> ( <span class="keyword">SELECT</span> <span class="keyword">id</span> <span class="keyword">FROM</span> Class_B B <span class="keyword">WHERE</span> A.id = B.id );</span><br></pre></td></tr></table></figure>
 
@@ -242,7 +242,7 @@
 4.DISTINCT
 5.UNION、INTERSECT、EXCEPT
 6.視窗函數(RANK ROW_NUMBER)</code></pre>
-<h4 id="善用集合運算的-ALL-選項"><a href="#善用集合運算的-ALL-選項" class="headerlink" title="善用集合運算的 ALL 選項"></a>善用集合運算的 ALL 選項</h4><p>SQL 具有 UNION、INTERSECT、EXCEPT 三種集合運算子，如果直接使用一定會為了排除重複資料而執行排序。</p>
+<h4 id="善用集合運算的-ALL-選項"><a href="#善用集合運算的-ALL-選項" class="headerlink" title="善用集合運算的 ALL 選項"></a>善用集合運算的 ALL 選項</h4><p>SQL具有UNION、INTERSECT、EXCEPT 三種集合運算子，如果直接使用一定會為了排除重複資料而執行排序。</p>
 <figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">SELECT</span> * <span class="keyword">FROM</span> Class_A</span><br><span class="line"> <span class="keyword">UNION</span></span><br><span class="line"><span class="keyword">SELECT</span> * <span class="keyword">FROM</span> Class_B;</span><br></pre></td></tr></table></figure>
 
 <p>結果</p>
@@ -345,7 +345,7 @@
 <td>7</td>
 </tr>
 </tbody></table>
-<p>根據上方商品主資料表選出業績表的商品，簡單說就是找出有業績的商品，此時書中說使用 IN 雖然不錯但知前面提到用連結會更好。</p>
+<p>根據上方商品主資料表選出業績表的商品，簡單說就是找出有業績的商品，此時書中說使用IN雖然不錯。但前面提到用連結會更好。</p>
 <figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">SELECT</span> I.item_no <span class="keyword">FROM</span> Items I <span class="keyword">INNER</span> <span class="keyword">JOIN</span> SalesHistory SH <span class="keyword">ON</span> I.item_no = SH.item_no;</span><br></pre></td></tr></table></figure>
 
 <p>結果</p>
@@ -378,7 +378,7 @@
 <td>30</td>
 </tr>
 </tbody></table>
-<p>於是一對多連結，就會出現重複資料，若要將重複資料排除勢必使用DISTINCT那這樣就會執行到排序，所以書中說到最佳解答是使用EXISTS，如此一來就不會執行排序。</p>
+<p>由於是一對多連結，就會出現重複資料，若要將重複資料排除勢必使用DISTINCT那這樣就會執行到排序，所以書中說到最佳解答是使用EXISTS，如此一來就不會執行排序。</p>
 <figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">SELECT</span> item_no <span class="keyword">FROM</span> Items I <span class="keyword">WHERE</span> <span class="keyword">EXISTS</span>(</span><br><span class="line">    <span class="keyword">SELECT</span> * <span class="keyword">FROM</span> SalesHistory SH <span class="keyword">WHERE</span> I.item_no = SH.item_no</span><br><span class="line">);</span><br></pre></td></tr></table></figure>
 
 <h2 id="於極值函數-MAX-MIN-使用索引值"><a href="#於極值函數-MAX-MIN-使用索引值" class="headerlink" title="於極值函數(MAX/MIN)使用索引值"></a>於極值函數(MAX/MIN)使用索引值</h2><p>SQL內建MAX跟MIN函數，使用時都會進行排序，但如果參數欄位已有索引值，就只需要掃描到該索引值，不需要搜尋整張表。</p>
@@ -419,7 +419,7 @@
 5.儘可能使用索引的排序。
 
 6.有時太多索引，反而會讓優化器混亂。</code></pre>
-<h4 id="加工索引值欄位"><a href="#加工索引值欄位" class="headerlink" title="加工索引值欄位"></a>加工索引值欄位</h4><figure class="highlight"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">SELECT</span> * <span class="keyword">FROM</span> SomeTable <span class="keyword">WHERE</span> col_1 * <span class="number">1.1</span> &gt; <span class="number">100</span>;</span><br><span class="line"></span><br><span class="line">WHERE col_1 &gt; 100 / 1.1</span><br></pre></td></tr></table></figure>
+<h4 id="加工索引值欄位"><a href="#加工索引值欄位" class="headerlink" title="加工索引值欄位"></a>加工索引值欄位</h4><figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">// NO</span><br><span class="line"><span class="keyword">SELECT</span> * <span class="keyword">FROM</span> SomeTable <span class="keyword">WHERE</span> col_1 * <span class="number">1.1</span> &gt; <span class="number">100</span>;</span><br><span class="line"></span><br><span class="line">// OK</span><br><span class="line"><span class="keyword">SELECT</span> * <span class="keyword">FROM</span> SomeTable <span class="keyword">WHERE</span> col_1 &gt; <span class="number">100</span> / <span class="number">1.1</span></span><br></pre></td></tr></table></figure>
 
 <p>若於搜尋條件右側使用公式，就會用到索引值。因此可以改成下列方式。同樣的在左側使用函數就無法使用到索引值。</p>
 <figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">SELECT</span> * <span class="keyword">FROM</span> SomeTable <span class="keyword">WHERE</span> <span class="keyword">SUBSTR</span>(col_1, <span class="number">1</span>, <span class="number">1</span>) = <span class="string">&#x27;a&#x27;</span>;</span><br></pre></td></tr></table></figure>
