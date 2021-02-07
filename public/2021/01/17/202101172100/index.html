@@ -1,0 +1,534 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="utf-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge"/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+
+<!--Description-->
+
+
+
+    <meta name="description" content="大家了解兩者的差異嗎?
+group by：對檢索結果的保留行進行單純分組，返回聚合之後的組的數據統計值的記錄。劃分為多組，每組返回一行。
+
+partition by：返回分組裡的每一條數據，在應用關聯的開窗函數前確定行集的分區和排序，然後，開窗函數將計算窗口中的每一行的值。
+
+
+SQL篩選各種資料時"/>
+
+
+<!--Author-->
+
+    <meta name="author" content="luezero"/>
+
+
+<!--Open Graph Title-->
+
+    <meta property="og:title" content="SQL 達人的工作現場攻略筆記 - CH-18 GROUP BY 與 PARTITION BY"/>
+
+
+<!--Open Graph Description-->
+
+    <meta property="og:description" content="大家了解兩者的差異嗎?
+group by：對檢索結果的保留行進行單純分組，返回聚合之後的組的數據統計值的記錄。劃分為多組，每組返回一行。
+
+partition by：返回分組裡的每一條數據，在應用關聯的開窗函數前確定行集的分區和排序，然後，開窗函數將計算窗口中的每一行的值。
+
+
+SQL篩選各種資料時"/>
+
+
+<!--Open Graph Site Name-->
+    <meta property="og:site_name" content="zero"/>
+
+<!--Type page-->
+
+    <meta property="og:type" content="article"/>
+
+
+<!--Page Cover-->
+
+
+    <meta property="og:image" content="https://luezero.github.io/img/home-bg2.jpg"/>
+
+
+<meta name="twitter:card" content="summary_large_image"/>
+
+
+
+
+    <meta name="twitter:image" content="https://luezero.github.io/img/home-bg2.jpg"/>
+
+
+<!-- Title -->
+
+<title>SQL 達人的工作現場攻略筆記 - CH-18 GROUP BY 與 PARTITION BY | zero</title>
+
+<!-- Bootstrap Core CSS -->
+<link rel="stylesheet" href="//cdn.jsdelivr.net/npm/bootstrap@4.4.1/dist/css/bootstrap.min.css">
+
+<!-- Custom CSS -->
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<!-- Custom Fonts -->
+<link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/font-awesome/5.11.0/css/all.min.css" />
+<link href="//fonts.googleapis.com/css?family=Lora:400,700,400italic,700italic" rel="stylesheet" type="text/css"/>
+<link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/font-awesome/5.11.0/css/all.min.css" />
+<link href="//fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@100;300;400;500;700;900&display=swap" rel="stylesheet">
+<link href="//fonts.googleapis.com/css?family=Open+Sans:300italic,400italic,600italic,700italic,800italic,400,300,600,700,800" rel="stylesheet" type="text/css"/>
+
+<!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
+<!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+<!--[if lt IE 9]>
+<script src="//oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+<script src="//oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
+<![endif]-->
+
+<!-- Gallery -->
+<link rel="stylesheet" href="//cdn.jsdelivr.net/npm/featherlight@1.4.0/src/featherlight.css" integrity="sha256-30DV/STftlyQ6v8yaOWlabammvCYtRJERLj/m0b3zno=" crossorigin="anonymous">
+<link rel="stylesheet" href="//cdn.jsdelivr.net/npm/lightgallery@1.6.11/dist/css/lightgallery.min.css">
+
+<!-- favicon -->
+
+<link rel="icon" href="/img/favicon2.png"/>
+
+
+
+    <!-- Google Analytics -->
+    
+
+
+<meta name="generator" content="Hexo 5.2.0"></head>
+<!-- Head tag -->
+
+<body>
+
+    <!-- Menu -->
+    <!-- Navigation -->
+<nav class="navbar navbar-default navbar-custom navbar-fixed-top bg-transparent position-absolute w-100 p-0" id="nav">
+    <div class="container pl-0 pr-0">
+        <!-- Brand and toggle get grouped for better mobile display -->
+        <div class="navbar-header page-scroll">
+            <a class="navbar-brand text-white p-1 pl-3" href="/">zero</a>
+        </div>
+        <div class="navbar-nav float-right">
+            <button class="btn btn-link search-btn navbar-item" data-toggle="modal" data-target="#searchModal">
+                <i class="fas fa-search"></i>
+            </button>
+        </div>
+    </div>
+    <!-- /.container -->
+</nav>
+
+    <!-- Main Content -->
+    <!-- Page Header -->
+<!-- Set your background image for this header in your post front-matter: cover -->
+
+<header class="intro-header" style="background-image: url('/img/home-bg2.jpg')">
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-12 col-md-12 text-center">
+                <div class="post-heading text-white">
+                    <h1>SQL 達人的工作現場攻略筆記 - CH-18 GROUP BY 與 PARTITION BY</h1>
+                    
+                </div>
+            </div>
+        </div>
+    </div>
+</header>
+
+<!-- Post Content -->
+<article>
+    <div class="container">
+        <div class="row">
+            <!-- Post Main Content -->
+            <div class="col-lg-8 offset-lg-2 col-md-10 offset-md-1">
+                
+                    <span class="meta d-inline-block">
+    
+        <i class="far fa-bookmark fa-fw"></i>
+        
+
+<a href="/categories/SQL/">SQL</a>
+
+    
+    
+    <!-- Date -->
+    
+        <span class="post-meta-split">&nbsp;|&nbsp;</span>
+        <i class="far fa-calendar-check fa-fw"></i>
+        2021-01-17
+    
+    <!-- word count and read count -->
+    
+
+    
+
+    
+</span>  
+                
+                <h4 id="大家了解兩者的差異嗎"><a href="#大家了解兩者的差異嗎" class="headerlink" title="大家了解兩者的差異嗎?"></a>大家了解兩者的差異嗎?</h4><ul>
+<li><p>group by：對檢索結果的保留行進行單純分組，返回聚合之後的組的數據統計值的記錄。劃分為多組，每組返回一行。</p>
+</li>
+<li><p>partition by：返回分組裡的每一條數據，在應用關聯的開窗函數前確定行集的分區和排序，然後，開窗函數將計算窗口中的每一行的值。</p>
+</li>
+</ul>
+<p>SQL篩選各種資料時，最基本操作就是某種準備替資料分組。其實除了使用SQL之外，日常生活中整理資料、查詢資料時，替資料建群組。</p>
+<p>而在SQL中具有建立群組功能就是GROUP BY 跟 PARTITION BY。這兩種方式都能利用資料表指定的 KEY 來分割資料，而兩者不同地方在於 GROUP BY 會再分割後，將資料彙整為1列，而PARTITION BY是將每一欄位取出統整整理。</p>
+<p>透過下列團隊成員資料表說明兩者差異。</p>
+<p>Teams</p>
+<div class="table-responsive">
+<table class="table table-bordered table-striped">
+<thead>
+<tr>
+<th>member</th>
+<th>team</th>
+<th>age</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>郁文</td>
+<td>A</td>
+<td>28</td>
+</tr>
+<tr>
+<td>瑋乃</td>
+<td>A</td>
+<td>19</td>
+</tr>
+<tr>
+<td>銘仁</td>
+<td>A</td>
+<td>23</td>
+</tr>
+<tr>
+<td>靚儀</td>
+<td>B</td>
+<td>40</td>
+</tr>
+<tr>
+<td>勝朋</td>
+<td>B</td>
+<td>29</td>
+</tr>
+<tr>
+<td>美美</td>
+<td>C</td>
+<td>30</td>
+</tr>
+<tr>
+<td>建國</td>
+<td>D</td>
+<td>28</td>
+</tr>
+<tr>
+<td>崇恩</td>
+<td>D</td>
+<td>28</td>
+</tr>
+<tr>
+<td>連雅</td>
+<td>D</td>
+<td>24</td>
+</tr>
+<tr>
+<td>光城</td>
+<td>D</td>
+<td>22</td>
+</tr>
+</tbody></table>
+<p>若以GROUP BY與PARTITION BY處理這張資料表，可寫出取得團隊資訊的查詢。不管使用哪個陳述句，Teams 資料表都會先分割部分集合，再以SUM函數彙整或RANK排出順位。</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">SELECT</span> <span class="keyword">member</span>,team,age,</span><br><span class="line"><span class="keyword">RANK</span>() <span class="keyword">OVER</span>(<span class="keyword">PARTITION</span> <span class="keyword">BY</span> team <span class="keyword">ORDER</span> <span class="keyword">BY</span> age <span class="keyword">DESC</span>) rn,</span><br><span class="line"><span class="keyword">DENSE_RANK</span>()  <span class="keyword">OVER</span>(<span class="keyword">PARTITION</span> <span class="keyword">BY</span> team <span class="keyword">ORDER</span> <span class="keyword">BY</span> age <span class="keyword">DESC</span>) dense_rn,</span><br><span class="line">ROW_RANK()  <span class="keyword">OVER</span>(<span class="keyword">PARTITION</span> <span class="keyword">BY</span> team <span class="keyword">ORDER</span> <span class="keyword">BY</span> age <span class="keyword">DESC</span>) row_num</span><br><span class="line"><span class="keyword">FROM</span> Members</span><br><span class="line"><span class="keyword">ORDER</span> <span class="keyword">BY</span> team, rn</span><br></pre></td></tr></table></figure>
+
+<p>結果</p>
+<div class="table-responsive">
+<table class="table table-bordered table-striped">
+<thead>
+<tr>
+<th>member</th>
+<th>team</th>
+<th>age</th>
+<th>rn</th>
+<th>dense_rn</th>
+<th>row_num</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>郁文</td>
+<td>A</td>
+<td>28</td>
+<td>1</td>
+<td>1</td>
+<td>2</td>
+</tr>
+<tr>
+<td>銘仁</td>
+<td>A</td>
+<td>23</td>
+<td>2</td>
+<td>2</td>
+<td>2</td>
+</tr>
+<tr>
+<td>瑋乃</td>
+<td>A</td>
+<td>19</td>
+<td>3</td>
+<td>3</td>
+<td>3</td>
+</tr>
+<tr>
+<td>靚儀</td>
+<td>B</td>
+<td>40</td>
+<td>1</td>
+<td>1</td>
+<td>1</td>
+</tr>
+<tr>
+<td>勝朋</td>
+<td>B</td>
+<td>29</td>
+<td>2</td>
+<td>2</td>
+<td>2</td>
+</tr>
+<tr>
+<td>美美</td>
+<td>C</td>
+<td>30</td>
+<td>1</td>
+<td>1</td>
+<td>1</td>
+</tr>
+<tr>
+<td>建國</td>
+<td>D</td>
+<td>28</td>
+<td>1</td>
+<td>1</td>
+<td>1</td>
+</tr>
+<tr>
+<td>崇恩</td>
+<td>D</td>
+<td>28</td>
+<td>1</td>
+<td>1</td>
+<td>2</td>
+</tr>
+<tr>
+<td>連雅</td>
+<td>D</td>
+<td>24</td>
+<td>3</td>
+<td>2</td>
+<td>3</td>
+</tr>
+<tr>
+<td>光城</td>
+<td>D</td>
+<td>22</td>
+<td>4</td>
+<td>3</td>
+<td>4</td>
+</tr>
+</tbody></table>
+<p>根據書中 286 頁圖片，使用圖形代表集合，是為了呈現分割，經過仔細觀察後發現</p>
+<pre><code>每一個都不是空集合
+部分集合總和等於分割前的集合
+隨機從中挑選兩個集合出來，不會有共通得部分。</code></pre>
+<p>由於部分集合本來就是從資料表分割而來，所以不會有空集合，且部分集合的傯和當然會是分割之的母體集合，所以不會有成員因為分割而失蹤。此外也不會有同時屬於兩個部分集合的成員。每一位成員必然隸屬一個集合。也就是說 GROUP BY 與 PARTITION BY 可將各成員分割至團隊得函數。</p>
+<h4 id="結論"><a href="#結論" class="headerlink" title="結論"></a>結論</h4><p>SQL 與 RDB 採用許多集合論以及群的成果，或許內容有點抽象，但也因為抽象內容，所以才廣泛應用。</p>
+
+            </div>
+
+            <!-- Post information -->
+            
+            
+    <div class="col-lg-8 offset-lg-2 col-md-10 offset-md-1">
+        <ul class="pagination d-block text-center">
+            
+            
+                <li class="next page-item d-inline"><a href="/2020/12/23/202012132016/" class="page-link float-right">上一頁  &rarr;</a></li>
+            
+        </ul>
+    </div>
+
+
+            
+                <!-- Comments -->
+                
+
+                
+
+            
+
+        </div>
+    </div>
+</article> 
+
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/tocbot/4.4.2/tocbot.css">
+    <style>
+        #toc-content .toc-link::before {
+            background-color: transparent;
+            max-height: 25px;
+        }
+
+        #toc-content .toc-link.is-active-link::before {
+            background-color: #404040;
+        }
+    </style>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/tocbot/4.4.2/tocbot.min.js"></script>
+    <div class="ui-toc dropup scrollspy-body pull-right" style="right: 3%;">
+        <button type="button" class="toc-btn btn btn-light" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" data-display="static">
+            <i class="fas fa-list"></i>
+        </button>
+        <div class="dropdown-menu dropdown-menu-right p-2"  aria-labelledby="tocLabel">
+            <div class="toc-widget">
+                <div id="toc-content" class="text-truncate">
+                </div>
+            </div>
+            <div class="toc-menu pt-3 pl-4">
+                <a class="expand-toggle d-block py-1" href="#"><span class="expand-text">全部展開</span><span class="close-text" style="display: none;">全部收起</span></a>
+                <a class="back-to-top d-block py-1" href="#">回到頂部</a>
+                <a class="go-to-bottom d-block py-1" href="#">移至底部</a>
+            </div>
+        </div>
+    </div>
+    <script>
+        tocbot.init({
+            // Where to render the table of contents.
+            tocSelector: '#toc-content',
+            // Where to grab the headings to build the table of contents.
+            contentSelector: 'article',
+            // Which headings to grab inside of the contentSelector element.
+            headingSelector: 'h1, h2, h3',
+            // For headings inside relative or absolute positioned containers within content.
+            hasInnerContainers: true,
+        });
+    </script>
+
+
+    
+
+
+    <!-- Footer -->
+    <hr />
+
+<!-- Footer -->
+<footer id="footer">
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-8 offset-lg-2 col-md-10 offset-md-1 text-center">
+                <ul class="list-inline">
+                    
+
+                    
+
+                    
+
+                    
+
+                    
+
+                    
+                </ul>
+                <ul class="copyright footer-menu list-inline">
+                    
+                    
+                        <li class="list-inline-item">
+                            
+                            
+                            <a href="/">
+                                
+                                    首頁
+                                
+                            </a>
+                        </li>
+                    
+                        <li class="list-inline-item">
+                            
+                                <span class="copyright-split">&nbsp;|&nbsp;</span>
+                            
+                            
+                            <a href="/archives">
+                                
+                                    文章
+                                
+                            </a>
+                        </li>
+                    
+                </ul>
+                <p class="copyright footer-author">
+                    &copy; -2021 
+                    <a rel="external" class="copyright-link" href="" target="_blank">luezero</a><br/>
+                    Powered by <a rel="external" class="copyright-link" href="https://hexo.io/" target="_blank">Hexo</a>  
+                    <span class="copyright-split">&nbsp;|&nbsp;&nbsp;</span>
+                    Theme <a rel="external" class="copyright-link" href="https://github.com/luswdev/hexo-theme-clean.git" target="_blank">Clean</a>
+                    
+                    
+                </p>
+            </div>
+        </div>
+    </div>
+</footer>
+
+
+    <!-- After footer scripts -->
+    <!-- jQuery -->
+<script src="//cdn.jsdelivr.net/npm/jquery@2.1.4/dist/jquery.min.js"></script>
+
+<!-- For drop down -->
+<script src="//cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js"></script>
+
+<!-- Bootstrap -->
+<script src="//cdn.jsdelivr.net/npm/bootstrap@4.4.1/dist/js/bootstrap.min.js"></script>
+<!-- Gallery -->
+<script src="//cdn.jsdelivr.net/npm/lightgallery@1.6.11/dist/js/lightgallery-all.min.js"></script>
+<!-- Busuanzi -->
+
+
+<!-- Search script -->
+
+<script src="/js/search.js"></script>
+
+<script type="text/javascript">
+    $(function () {
+        searchFunc( '/search.xml' , 'searchInput', 'searchResult');
+    });
+</script>
+
+
+
+<script src="/js/main.js"></script>
+
+
+
+    <!-- Search Modal -->
+    <!-- Modal -->
+<div class="modal fade" id="searchModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+    <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
+        <div class="modal-content overflow-auto">
+            <div class="modal-header">
+                <input type="text" class="form-control" placeholder="搜尋關鍵字..." id="searchInput">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><i class="fas fa-times"></i></button>
+            </div>
+            <div class="modal-body">
+                <div id="searchResult">
+                    <div class="search-empty text-center text-muted p-5">
+                        <i class="far fa-meh"></i>
+                    </div>
+                </div>
+            </div> 
+        </div>
+    </div>
+</div>
+
+
+</body>
+</html>
