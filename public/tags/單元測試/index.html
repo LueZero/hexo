@@ -9,9 +9,6 @@
 
 
 
-    <meta name="description" content="前言使用google app script 方式開發功能是非常方便的工具，但使用方式可能跟一般在運行javascript不太一樣，它是有一套自己運行週期，而主要程式語法還是圍繞在jacascriptgp身上，也有封裝包好google相關套件上，例如試算表等。
-製作 LINE 官方網站 訂單查詢app"/>
-
 
 <!--Author-->
 
@@ -20,13 +17,10 @@
 
 <!--Open Graph Title-->
 
-    <meta property="og:title" content="google app script"/>
+    <meta property="og:title" content="zero"/>
 
 
 <!--Open Graph Description-->
-
-    <meta property="og:description" content="前言使用google app script 方式開發功能是非常方便的工具，但使用方式可能跟一般在運行javascript不太一樣，它是有一套自己運行週期，而主要程式語法還是圍繞在jacascriptgp身上，也有封裝包好google相關套件上，例如試算表等。
-製作 LINE 官方網站 訂單查詢app"/>
 
 
 <!--Open Graph Site Name-->
@@ -34,7 +28,7 @@
 
 <!--Type page-->
 
-    <meta property="og:type" content="article"/>
+    <meta property="og:type" content="website"/>
 
 
 <!--Page Cover-->
@@ -53,7 +47,7 @@
 
 <!-- Title -->
 
-<title>google app script | zero</title>
+<title>單元測試 | zero</title>
 
 <!-- Bootstrap Core CSS -->
 <link rel="stylesheet" href="//cdn.jsdelivr.net/npm/bootstrap@4.4.1/dist/css/bootstrap.min.css">
@@ -114,136 +108,60 @@
 </nav>
 
     <!-- Main Content -->
-    <!-- Page Header -->
-<!-- Set your background image for this header in your post front-matter: cover -->
-
-<header class="intro-header" style="background-image: url('/img/home-bg2.jpg')">
+    <header class="intro-header" style="background-image: url('/img/home-bg2.jpg')">
     <div class="container">
         <div class="row">
-            <div class="col-lg-12 col-md-12 text-center">
-                <div class="post-heading text-white">
-                    <h1>google app script</h1>
-                    
+            <div class="col-lg-8 offset-lg-2 col-md-10 offset-md-1">
+                <div class="site-heading text-center text-white">
+                    <h1>標籤：單元測試</h1>
                 </div>
             </div>
         </div>
     </div>
 </header>
 
-<!-- Post Content -->
-<article>
-    <div class="container">
-        <div class="row">
-            <!-- Post Main Content -->
+<!-- Main Content -->
+<div class="container page-tags">
+    <div class="row">
+        <div class="col-lg-10 offset-lg-1 text-center">
+            
+                
+    <a href="/tags/%E5%96%AE%E5%85%83%E6%B8%AC%E8%A9%A6/" class="btn btn-info m-2">
+        單元測試
+        <span class="badge badge-light">1</span>
+    </a>
+
+
+            
+        </div>
+        
             <div class="col-lg-8 offset-lg-2 col-md-10 offset-md-1">
+                <hr class="tag-preview-hr">
                 
-                    <span class="meta d-inline-block">
-    
-    
-    <!-- Date -->
-    
-        <span class="post-meta-split">&nbsp;|&nbsp;</span>
-        <i class="far fa-calendar-check fa-fw"></i>
-        2020-12-22
-    
-    <!-- word count and read count -->
-    
-
-    
-
-    
-</span>  
+                    <div class="post-preview post-preview-archive-tag">
+    <a href="/2021/03/06/202103061655/">
+        <h1 class="post-title">
+            單元測試的藝術 第二版 - 01 單元測試藝術
+        </h1>
+    </a>
+    <p class="post-meta">
+        <!-- Date and Author -->
+        
+        2021-03-06
+    </p>
+</div>
                 
-                <h4 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h4><p>使用google app script 方式開發功能是非常方便的工具，但使用方式可能跟一般在運行javascript不太一樣，它是有一套自己運行週期，而主要程式語法還是圍繞在jacascriptgp身上，也有封裝包好google相關套件上，例如試算表等。</p>
-<h4 id="製作-LINE-官方網站-訂單查詢"><a href="#製作-LINE-官方網站-訂單查詢" class="headerlink" title="製作 LINE 官方網站 訂單查詢"></a>製作 LINE 官方網站 訂單查詢</h4><h4 id="app-script-相關窗口"><a href="#app-script-相關窗口" class="headerlink" title="app script 相關窗口"></a>app script 相關窗口</h4><ol>
-<li><p>onOpen(e) 當用戶打開用戶有權編輯的電子表格，文檔，演示文稿或表單時運行。</p>
-</li>
-<li><p>onInstall(e) 當用戶從Google文檔，表格，幻燈片或表單中安裝編輯器加載項時運行。</p>
-</li>
-<li><p>onEdit(e) 當用戶更改電子表格中的值時運行。</p>
-</li>
-<li><p>onSelectionChange(e) 當用戶更改電子表格中的選擇時運行。</p>
-</li>
-<li><p>doGet(e) 當用戶訪問網絡應用或程序將HTTP GET請求發送到網絡應用。</p>
-</li>
-<li><p>doPost(e) 當程序將HTTP POST請求發送到Web應用程序時運行。</p>
-</li>
-</ol>
-<p>上面各項函數是透過執行google app script主要執行窗口，想像是程式碼執行會先啟動位置。</p>
-
+                <div class="archive-before-pagination"></div>
+                <ul class="pagination d-block text-center">
+    
+    
+</ul>
             </div>
-
-            <!-- Post information -->
-            
-            
-    <div class="col-lg-8 offset-lg-2 col-md-10 offset-md-1">
-        <ul class="pagination d-block text-center">
-            
-                <li class="previous page-item d-inline"><a href="/2020/12/23/202012132016/" class="page-link float-left">&larr;  下一頁</a></li>
-            
-            
-                <li class="next page-item d-inline"><a href="/2020/11/17/202011172350/" class="page-link float-right">上一頁  &rarr;</a></li>
-            
-        </ul>
+        
     </div>
+</div>
 
 
-            
-                <!-- Comments -->
-                
-
-                
-
-            
-
-        </div>
-    </div>
-</article> 
-
-
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/tocbot/4.4.2/tocbot.css">
-    <style>
-        #toc-content .toc-link::before {
-            background-color: transparent;
-            max-height: 25px;
-        }
-
-        #toc-content .toc-link.is-active-link::before {
-            background-color: #404040;
-        }
-    </style>
-    <script src="//cdnjs.cloudflare.com/ajax/libs/tocbot/4.4.2/tocbot.min.js"></script>
-    <div class="ui-toc dropup scrollspy-body pull-right" style="right: 3%;">
-        <button type="button" class="toc-btn btn btn-light" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" data-display="static">
-            <i class="fas fa-list"></i>
-        </button>
-        <div class="dropdown-menu dropdown-menu-right p-2"  aria-labelledby="tocLabel">
-            <div class="toc-widget">
-                <div id="toc-content" class="text-truncate">
-                </div>
-            </div>
-            <div class="toc-menu pt-3 pl-4">
-                <a class="expand-toggle d-block py-1" href="#"><span class="expand-text">全部展開</span><span class="close-text" style="display: none;">全部收起</span></a>
-                <a class="back-to-top d-block py-1" href="#">回到頂部</a>
-                <a class="go-to-bottom d-block py-1" href="#">移至底部</a>
-            </div>
-        </div>
-    </div>
-    <script>
-        tocbot.init({
-            // Where to render the table of contents.
-            tocSelector: '#toc-content',
-            // Where to grab the headings to build the table of contents.
-            contentSelector: 'article',
-            // Which headings to grab inside of the contentSelector element.
-            headingSelector: 'h1, h2, h3',
-            // For headings inside relative or absolute positioned containers within content.
-            hasInnerContainers: true,
-        });
-    </script>
-
-
-    
 
 
     <!-- Footer -->
