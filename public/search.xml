@@ -1,0 +1,880 @@
+<?xml version="1.0" encoding="utf-8"?>
+<search>
+  <entry>
+    <title>PHP 簡單寫法</title>
+    <url>/2020/11/15/php/202011131151/</url>
+    <content><![CDATA[<h4 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h4><p>&nbsp;&nbsp;&nbsp;&nbsp;使用PHP語言時是不是覺得code的語法很簡單或是方便，比期編譯語言程式碼如JAVA、C#、C等個要來得簡單，但是隨著需求功能增加code份量就會增加，這時候就是朝向clean code方面去開發，但本章節不是探討clean code的而是<strong>程式碼簡單寫法</strong>。</p>
+<h4 id="何謂簡單寫法"><a href="#何謂簡單寫法" class="headerlink" title="何謂簡單寫法"></a>何謂簡單寫法</h4><p>&nbsp;&nbsp;&nbsp;&nbsp;簡單寫法是一段程式碼從複雜到簡單，舉例來說條件式判斷常常占用到3行以上，下面這段條件式判斷，其實可以簡易條件式方式來縮短程式碼，來達到簡單程式碼。</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">&#x2F;&#x2F; 複雜</span><br><span class="line">$food &#x3D; &quot;漢堡&quot;;</span><br><span class="line">$eat &#x3D; &quot;&quot;;</span><br><span class="line"></span><br><span class="line">if($food &#x3D;&#x3D; &quot;漢堡&quot;)</span><br><span class="line">&#123;</span><br><span class="line">    $eat &#x3D; &quot;開動&quot;;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">&#x2F;&#x2F; 簡單</span><br><span class="line">$food &#x3D; &quot;漢堡&quot;;</span><br><span class="line">$eat &#x3D; ($food &#x3D;&#x3D; &quot;漢堡&quot; ? &quot;開動&quot; : &quot;&quot;);</span><br></pre></td></tr></table></figure>
+<p>&nbsp;&nbsp;&nbsp;&nbsp;而如果是畫面上印出資料時需要透過echo or print，其實可以透過更簡短方式<?=$xxx; ?>直接印出來。</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">$str &#x3D; &quot;Hello Word&quot;;</span><br><span class="line"></span><br><span class="line">&#x2F;&#x2F;複雜</span><br><span class="line">&lt;?php echo $str; ?&gt;</span><br><span class="line"></span><br><span class="line">&#x2F;&#x2F;簡單</span><br><span class="line">&lt;?&#x3D;$str; ?&gt;</span><br></pre></td></tr></table></figure>
+<p>&nbsp;&nbsp;&nbsp;&nbsp;小結:其實簡單寫法是為了讓複雜程式碼更簡單更好閱讀，雖說沒有一定準則但是能讓程式碼更短不是好嗎。</p>
+]]></content>
+      <categories>
+        <category>程式</category>
+      </categories>
+  </entry>
+  <entry>
+    <title>SQL 達人的工作現場攻略筆記 - CH-3 自我連結使用方式</title>
+    <url>/2020/11/17/sql/202011172350/</url>
+    <content><![CDATA[<h4 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h4><p>SQL 提供連結會依照特徵命名，分別為<strong>內部連結</strong>、<strong>外部連結</strong>、<strong>交叉連結</strong>這些，且這些連結通常會以不同的資料表為對象，但 SQL 並未禁止同一張表用連結，此時在同一張資料表套用連結稱為<strong>自我連結 self join</strong>。</p>
+<h4 id="一、重複排序、排列、結合"><a href="#一、重複排序、排列、結合" class="headerlink" title="一、重複排序、排列、結合"></a>一、重複排序、排列、結合</h4><p>假設有張表商品與價錢資料表、其中共有蘋果、橘子、香蕉三筆記錄不得不製作業績表時候，必須取得商品組合。</p>
+<table>
+<thead>
+<tr>
+<th>name(產品名稱)</th>
+<th>price (價錢)</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>蘋果</td>
+<td>100</td>
+</tr>
+<tr>
+<td>橘子</td>
+<td>50</td>
+</tr>
+<tr>
+<td>香蕉</td>
+<td>80</td>
+</tr>
+</tbody></table>
+<p>說是組合其實組合的種類有兩種，一種是重視的排列順序<strong>有序數對</strong>(ordered pair)，另一種是不重視順序的<strong>無序數對</strong>(unordered pair)。要建立有序數對非常簡單，例如:</p>
+<figure class="highlight sql"><table><tr><td class="code"><pre><span class="line">建立重複排序SQL</span><br><span class="line"><span class="keyword">SELECT</span> P1.name <span class="keyword">AS</span> name_1, P2.name <span class="keyword">AS</span> name_2　</span><br><span class="line"><span class="keyword">FROM</span> Products P1 <span class="keyword">CROSS</span> <span class="keyword">JOIN</span> Products P2;</span><br></pre></td></tr></table></figure>
+
+<p>結果:</p>
+<table>
+<thead>
+<tr>
+<th>name_1</th>
+<th>name_2</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>蘋果</td>
+<td>蘋果</td>
+</tr>
+<tr>
+<td>蘋果</td>
+<td>橘子</td>
+</tr>
+<tr>
+<td>蘋果</td>
+<td>香蕉</td>
+</tr>
+<tr>
+<td>橘子</td>
+<td>蘋果</td>
+</tr>
+<tr>
+<td>橘子</td>
+<td>橘子</td>
+</tr>
+<tr>
+<td>橘子</td>
+<td>香蕉</td>
+</tr>
+<tr>
+<td>香蕉</td>
+<td>蘋果</td>
+</tr>
+<tr>
+<td>香蕉</td>
+<td>橘子</td>
+</tr>
+<tr>
+<td>香蕉</td>
+<td>香蕉</td>
+</tr>
+</tbody></table>
+<p>交叉連接為兩個資料表間的笛卡兒乘積 (Cartesian product)，兩個資料表在結合時，不指定任何條件，即將兩個資料表中所有的可能排列組合出來。可以看到這種連結方式出現很多多餘的組合，這都是因為重視順序的集合，此外也可以將交叉連結寫成以下方式‧</p>
+<figure class="highlight sql"><table><tr><td class="code"><pre><span class="line">交叉連結另一種寫法</span><br><span class="line"><span class="keyword">SELECT</span> P1.name <span class="keyword">AS</span> name_1, P2.name <span class="keyword">AS</span> name_2　</span><br><span class="line"><span class="keyword">FROM</span> Products P1, Products P2;</span><br></pre></td></tr></table></figure>
+
+<p>此時作者卻說這種語法不要使用，原因是因為希望執行設有連結條件的內部連結，卻有可能忘記撰寫連結條件而變成交叉連結，產生預料之外的結果，交叉連結會消耗少不資源。接著將程式碼改寫成排除多餘的集合內容。首先排除(蘋果，蘋果)這種元素組合。</p>
+<figure class="highlight sql"><table><tr><td class="code"><pre><span class="line">取得排列SQL</span><br><span class="line"><span class="keyword">SELECT</span> P1.name <span class="keyword">AS</span> name_1, P2.name <span class="keyword">AS</span> name_2　</span><br><span class="line"><span class="keyword">FROM</span> Products P1 <span class="keyword">INNER</span> <span class="keyword">JOIN</span> Products P2 <span class="keyword">ON</span> P1.name &lt;&gt; P2.name;</span><br></pre></td></tr></table></figure>
+
+<p>結果:</p>
+<table>
+<thead>
+<tr>
+<th>name_1</th>
+<th>name_2</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>蘋果</td>
+<td>橘子</td>
+</tr>
+<tr>
+<td>蘋果</td>
+<td>香蕉</td>
+</tr>
+<tr>
+<td>橘子</td>
+<td>蘋果</td>
+</tr>
+<tr>
+<td>橘子</td>
+<td>香蕉</td>
+</tr>
+<tr>
+<td>香蕉</td>
+<td>蘋果</td>
+</tr>
+<tr>
+<td>香蕉</td>
+<td>橘子</td>
+</tr>
+</tbody></table>
+<blockquote>
+<p>ಠ_ಠ CROSS JOIN mysql 是舊版可能不支援此寫法，就會有使用 FROM table1,table2 方式。</p>
+</blockquote>
+<p>早期語法可能使用下列，但只要錯誤一步就有可能會寫成剛剛的交叉連結，所以盡可能不要使用此寫法。原因是因為忘記加上 WHERE 條件就會執行交叉連結，但若是使用 INNER JOIN 的語法就算忘記大部的 DBMS 都會視為語法錯誤。</p>
+<figure class="highlight sql"><table><tr><td class="code"><pre><span class="line">取得排列SQL</span><br><span class="line"><span class="keyword">SELECT</span> P1.name <span class="keyword">AS</span> name_1, P2.name <span class="keyword">AS</span> name_2　</span><br><span class="line"><span class="keyword">FROM</span> Products P1, Products P2</span><br><span class="line"><span class="keyword">WHERE</span> P1.name &lt;&gt; P2.name;</span><br></pre></td></tr></table></figure>
+
+<p>這裡說明如果上面忘記轉寫條件又會變成交叉連結，但使用 INNER JOIN 方式忘記寫條件系統就會噴錯，算是一種安全的寫法。接下來作者叫我們嘗試排除(蘋果、橘子)與(橘子、蘋果)這種只是調換順序組合。</p>
+<figure class="highlight sql"><table><tr><td class="code"><pre><span class="line">取得組合SQL</span><br><span class="line"><span class="keyword">SELECT</span> P1.name <span class="keyword">AS</span> name_1, P2.name <span class="keyword">AS</span> name_2</span><br><span class="line">  <span class="keyword">FROM</span> Products P1</span><br><span class="line">  <span class="keyword">INNER</span> <span class="keyword">JOIN</span> Products P2 <span class="keyword">ON</span> P1.name &gt; P2.name</span><br></pre></td></tr></table></figure>
+
+<p>結果:</p>
+<table>
+<thead>
+<tr>
+<th>name_1</th>
+<th>name_2</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>蘋果</td>
+<td>橘子</td>
+</tr>
+<tr>
+<td>香蕉</td>
+<td>橘子</td>
+</tr>
+<tr>
+<td>香蕉</td>
+<td>蘋果</td>
+</tr>
+</tbody></table>
+<p>若想取得三種以上得組合，只需將程式碼改成以下內容。</p>
+<figure class="highlight sql"><table><tr><td class="code"><pre><span class="line">取得組合SQL 擴充三欄位版本</span><br><span class="line"><span class="keyword">SELECT</span> P1.name <span class="keyword">AS</span> name_1,</span><br><span class="line">       P2.name <span class="keyword">AS</span> name_2,　</span><br><span class="line">       P3.name <span class="keyword">AS</span> name_3,</span><br><span class="line">  <span class="keyword">FROM</span> Products P1</span><br><span class="line">  <span class="keyword">INNER</span> <span class="keyword">JOIN</span> Products P2 <span class="keyword">ON</span> P1.name &gt; P2.name</span><br><span class="line">  <span class="keyword">INNER</span> <span class="keyword">JOIN</span> Products P3 <span class="keyword">ON</span> P2.name &gt; P3.name;</span><br></pre></td></tr></table></figure>
+
+<p>結果:</p>
+<table>
+<thead>
+<tr>
+<th>name_1</th>
+<th>name_2</th>
+<th>name_3</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>蘋果</td>
+<td>橘子</td>
+<td>香蕉</td>
+</tr>
+</tbody></table>
+<p>除了例題使用的=之外，使用&gt;、&lt;、&lt;&gt;這種比較運算子連結稱為<strong>非等值連結</strong>。這種連結與自我連結一起使用也稱為<strong>自我非等值連結</strong>。這種一般來說不太會在商業邏輯使用，但會建立在欄位組合使用。</p>
+<h4 id="二、刪除重複列"><a href="#二、刪除重複列" class="headerlink" title="二、刪除重複列"></a>二、刪除重複列</h4><p>在關聯式資料世界裡，重複列與 NULL 差不多是令人討厭，所以也有許多排列重複列的方法因此問世。用剛剛產品資料表例子，試著排除重複出現橘子，而這張表沒有設定Key。</p>
+<figure class="highlight sql"><table><tr><td class="code"><pre><span class="line">刪除重複列SQL</span><br><span class="line"><span class="keyword">DELETE</span> <span class="keyword">FROM</span> Products P1</span><br><span class="line"><span class="keyword">WHERE</span> <span class="keyword">rowid</span> &lt; (<span class="keyword">SELECT</span> <span class="keyword">MAX</span>(P2.rowid)</span><br><span class="line"><span class="keyword">FROM</span> Products P2 <span class="keyword">WHERE</span> P1.name = P2.name <span class="keyword">AND</span> P1.price = P2.price);</span><br></pre></td></tr></table></figure>
+
+<p>這裡使用方式是虛擬欄位去取得列的編號因為這張表沒有設定Key關係，而在mysql中是名稱是使用_rowid，<br>在SQL裡擁有不同名稱的集合被當成不同的集合，即使物理層級相同的存在，在邏輯層級仍屬於不同的存在。</p>
+<h4 id="三、部分不一致的-Key-搜尋"><a href="#三、部分不一致的-Key-搜尋" class="headerlink" title="三、部分不一致的 Key 搜尋"></a>三、部分不一致的 Key 搜尋</h4><table>
+<thead>
+<tr>
+<th>name(姓名)</th>
+<th>family_id(家庭 ID)</th>
+<th>address(地址)</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>許郁文</td>
+<td>100</td>
+<td>台北市萬華區長泰街 3-2-29</td>
+</tr>
+<tr>
+<td>許美美</td>
+<td>100</td>
+<td>台北市萬華區長泰街 3-2-92</td>
+</tr>
+<tr>
+<td>張瑋礽</td>
+<td>200</td>
+<td>台北市中正區南海路 2-8-1</td>
+</tr>
+<tr>
+<td>張銘仁</td>
+<td>200</td>
+<td>台北市中正區南海路 2-8-1</td>
+</tr>
+<tr>
+<td>Holmes</td>
+<td>300</td>
+<td>貝克街 221B</td>
+</tr>
+<tr>
+<td>Watson</td>
+<td>400</td>
+<td>貝克街 221B</td>
+</tr>
+</tbody></table>
+<p>接下來將下列聯絡人資料表為例。主 Key 是人名，同一家族的人使用相同家族 ID，基本上同一家人會有相同的地址，但也有像是 Holmes 跟 Watson 這種還不是家人卻同居的情侶，書中是說將目光放在許家夫妻上，這兩個人並不是分居而是地址有誤，以這種情況如何篩選出是同一家人但地址卻不一致的紀錄呢?</p>
+<figure class="highlight sql"><table><tr><td class="code"><pre><span class="line">搜尋同一家人，地址不同的SQL</span><br><span class="line"><span class="keyword">SELECT</span> <span class="keyword">DISTINCT</span> A1.name,A1.address</span><br><span class="line"><span class="keyword">FROM</span> Address A1 <span class="keyword">INNER</span> <span class="keyword">JOIN</span> Address A2 <span class="keyword">ON</span> A1.family_id = A2.family_id</span><br><span class="line"><span class="keyword">AND</span> A1.address &lt;&gt; A2.address;</span><br></pre></td></tr></table></figure>
+
+<blockquote>
+<p>方法有很多種但如果是自我非等值連結撰寫，就能將程式碼寫得很簡潔。</p>
+</blockquote>
+<p>從下面商品資料表找出相同價格商品</p>
+<table>
+<thead>
+<tr>
+<th>name(商品名稱)</th>
+<th>price(價格)</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>蘋果</td>
+<td>50</td>
+</tr>
+<tr>
+<td>橘子</td>
+<td>100</td>
+</tr>
+<tr>
+<td>葡萄</td>
+<td>50</td>
+</tr>
+<tr>
+<td>西瓜</td>
+<td>80</td>
+</tr>
+<tr>
+<td>檸檬</td>
+<td>30</td>
+</tr>
+<tr>
+<td>草莓</td>
+<td>100</td>
+</tr>
+<tr>
+<td>香蕉</td>
+<td>100</td>
+</tr>
+</tbody></table>
+<figure class="highlight sql"><table><tr><td class="code"><pre><span class="line">搜尋價格相同，商品名稱卻不同SQL</span><br><span class="line"><span class="keyword">SELECT</span> <span class="keyword">DISTINCT</span> A1.name,A1.price</span><br><span class="line"><span class="keyword">FROM</span> Product A1 <span class="keyword">INNER</span> <span class="keyword">JOIN</span> Product A2 <span class="keyword">ON</span> A1.price = A2.price</span><br><span class="line"><span class="keyword">AND</span> A1.name &lt;&gt; A2.name</span><br><span class="line"><span class="keyword">ORDER</span> <span class="keyword">BY</span> P1.price;</span><br></pre></td></tr></table></figure>
+
+<p>結果:</p>
+<table>
+<thead>
+<tr>
+<th>name(商品名稱)</th>
+<th>price(價格)</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>蘋果</td>
+<td>50</td>
+</tr>
+<tr>
+<td>葡萄</td>
+<td>50</td>
+</tr>
+<tr>
+<td>草莓</td>
+<td>100</td>
+</tr>
+<tr>
+<td>橘子</td>
+<td>100</td>
+</tr>
+<tr>
+<td>香蕉</td>
+<td>100</td>
+</tr>
+</tbody></table>
+<h4 id="四、總結"><a href="#四、總結" class="headerlink" title="四、總結"></a>四、總結</h4><p>自我連結就是利用自身表去找出想要的資料。</p>
+<p>1.自我連結通常會與非等值連結搭配使用。</p>
+<p>2.與 GROUP BY 組合可建立遞迴性集合。</p>
+<p>3.想成是讓不同資料表連結。</p>
+<p>4.從邏輯層級思考，而不是物理層級。</p>
+<p>參考資料: </p>
+<p>1.SQL 達人的工作現場攻略筆</p>
+]]></content>
+      <categories>
+        <category>SQL</category>
+      </categories>
+  </entry>
+  <entry>
+    <title>SQL 達人的工作現場攻略筆記 - CH-11 要讓SQL加速囉</title>
+    <url>/2020/12/23/sql/202012132016/</url>
+    <content><![CDATA[<h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>SQL 的效能一直是 DB 工程師必須面對的主要課程之一，甚至有些人認為是唯一的課題。此章節是改善 SQL 的效能，讓執行速度更快減少更多資源。</p>
+<h2 id="使用效率的搜尋"><a href="#使用效率的搜尋" class="headerlink" title="使用效率的搜尋"></a>使用效率的搜尋</h2><h4 id="若子查詢為參數"><a href="#若子查詢為參數" class="headerlink" title="若子查詢為參數"></a>若子查詢為參數</h4><p>使用(EXISTS)代替(IN)，在 IN 述詞很方便，也很好讀，但卻會遇到效能瓶頸的問題，若當 IN 參數(1,2,3)這種 List 時繼就不需要改寫，但如果以子查詢為參數就必須要注意，通常 NOT IN 跟 NOT EXISTS 都是回傳相同的結果，但是使用 EXISTS 建立子查詢卻快的很多。</p>
+<p>Class_A</p>
+<table>
+<thead>
+<tr>
+<th>id(識別子)</th>
+<th>name (姓名)</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>1</td>
+<td>郁</td>
+</tr>
+<tr>
+<td>2</td>
+<td>瑋</td>
+</tr>
+<tr>
+<td>3</td>
+<td>銘</td>
+</tr>
+</tbody></table>
+<p>Class_B</p>
+<table>
+<thead>
+<tr>
+<th>id(識別子)</th>
+<th>name(姓名)</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>1</td>
+<td>郁</td>
+</tr>
+<tr>
+<td>2</td>
+<td>瑋</td>
+</tr>
+<tr>
+<td>4</td>
+<td>靚</td>
+</tr>
+</tbody></table>
+<p>試著從 Class_A 表找出 Class_B 資料表也有的學生。</p>
+<figure class="highlight sql"><table><tr><td class="code"><pre><span class="line">較慢</span><br><span class="line"><span class="keyword">SELECT</span> * <span class="keyword">FROM</span> Class_A <span class="keyword">WHERE</span> <span class="keyword">id</span> <span class="keyword">IN</span> ( <span class="keyword">SELECT</span> <span class="keyword">id</span> <span class="keyword">FROM</span> Class_B);</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight sql"><table><tr><td class="code"><pre><span class="line">較快</span><br><span class="line"><span class="keyword">SELECT</span> * <span class="keyword">FROM</span> Class_A A <span class="keyword">WHERE</span> <span class="keyword">EXISTS</span> ( <span class="keyword">SELECT</span> <span class="keyword">id</span> <span class="keyword">FROM</span> Class_B B <span class="keyword">WHERE</span> A.id = B.id );</span><br></pre></td></tr></table></figure>
+
+<p>結果</p>
+<table>
+<thead>
+<tr>
+<th>id(識別子)</th>
+<th>name(姓名)</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>1</td>
+<td>郁</td>
+</tr>
+<tr>
+<td>2</td>
+<td>瑋</td>
+</tr>
+</tbody></table>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">為什麼EXISTS會比較快？大致上有兩個理由。</span><br><span class="line">1.如果連結key帶有索引值，就可能直接按照索引值，不需觀察Class_B的資料表。</span><br><span class="line">2.EXISTS只要找到一筆符合的列，就會立刻停止搜尋，不會是IN得全面搜尋一遍。</span><br></pre></td></tr></table></figure>
+
+<h4 id="子查詢為參數時，使用連結代替-IN"><a href="#子查詢為參數時，使用連結代替-IN" class="headerlink" title="子查詢為參數時，使用連結代替 IN"></a>子查詢為參數時，使用連結代替 IN</h4><p>要改善 IN 的效能，除了使用 EXISTS 改寫，也可以利用連結方式去實現。</p>
+<figure class="highlight sql"><table><tr><td class="code"><pre><span class="line"><span class="keyword">SELECT</span> Ａ.id,A.name <span class="keyword">FROM</span> Class_A A <span class="keyword">INNER</span> <span class="keyword">JOIN</span> Class_B B <span class="keyword">ON</span> A.id = B.id;</span><br></pre></td></tr></table></figure>
+
+<h2 id="避開排序"><a href="#避開排序" class="headerlink" title="避開排序"></a>避開排序</h2><p>SQL 與程式語言不同，使用者無法直接命令 DBMS 指定排序運算，不過這不代表 DBMS 不執行排序，更精準的說是 DBMS 非常頻繁的偷偷執行排序，也導致使用者不用去理會哪中運算正在執行排序。</p>
+<p>會執行排序如下 :</p>
+<pre><code>1.GROUP BY
+2.ORDER BY
+3.彙總函數(SUM、COUNT、AVG、MAX、MIN)
+4.DISTINCT
+5.UNION、INTERSECT、EXCEPT
+6.視窗函數(RANK ROW_NUMBER)</code></pre>
+<h4 id="善用集合運算的-ALL-選項"><a href="#善用集合運算的-ALL-選項" class="headerlink" title="善用集合運算的 ALL 選項"></a>善用集合運算的 ALL 選項</h4><p>SQL具有UNION、INTERSECT、EXCEPT 三種集合運算子，如果直接使用一定會為了排除重複資料而執行排序。</p>
+<figure class="highlight sql"><table><tr><td class="code"><pre><span class="line"><span class="keyword">SELECT</span> * <span class="keyword">FROM</span> Class_A</span><br><span class="line"> <span class="keyword">UNION</span></span><br><span class="line"><span class="keyword">SELECT</span> * <span class="keyword">FROM</span> Class_B;</span><br></pre></td></tr></table></figure>
+
+<p>結果</p>
+<table>
+<thead>
+<tr>
+<th>id(識別子)</th>
+<th>name(姓名)</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>1</td>
+<td>郁</td>
+</tr>
+<tr>
+<td>2</td>
+<td>瑋</td>
+</tr>
+<tr>
+<td>3</td>
+<td>銘</td>
+</tr>
+<tr>
+<td>4</td>
+<td>靚</td>
+</tr>
+</tbody></table>
+<p>如果不用在乎重複資料或事先知道不會有重複資料，可以利用 UNION ALL 代替，避免執行排序。</p>
+<h4 id="以-EXISTS-代替-DISTINCT"><a href="#以-EXISTS-代替-DISTINCT" class="headerlink" title="以 EXISTS 代替 DISTINCT"></a>以 EXISTS 代替 DISTINCT</h4><p>DISTINCT 也會為了排除重複資料而執行排序。若是為了統整兩張表連結結果而使用 DISTINCT 的情況，也可以使用 EXISTS 代替，也能避免執行排序。</p>
+<p>Items</p>
+<table>
+<thead>
+<tr>
+<th>item_no</th>
+<th>item</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>10</td>
+<td>SD 記憶卡</td>
+</tr>
+<tr>
+<td>20</td>
+<td>CD-R</td>
+</tr>
+<tr>
+<td>30</td>
+<td>USB 隨身碟</td>
+</tr>
+<tr>
+<td>40</td>
+<td>DVD</td>
+</tr>
+</tbody></table>
+<p>SalesHistory</p>
+<table>
+<thead>
+<tr>
+<th>sale_date</th>
+<th>item_no</th>
+<th>quantity</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>2020-10-01</td>
+<td>10</td>
+<td>4</td>
+</tr>
+<tr>
+<td>2020-10-01</td>
+<td>20</td>
+<td>10</td>
+</tr>
+<tr>
+<td>2020-10-01</td>
+<td>30</td>
+<td>3</td>
+</tr>
+<tr>
+<td>2020-10-03</td>
+<td>10</td>
+<td>32</td>
+</tr>
+<tr>
+<td>2020-10-03</td>
+<td>30</td>
+<td>12</td>
+</tr>
+<tr>
+<td>2020-10-04</td>
+<td>20</td>
+<td>22</td>
+</tr>
+<tr>
+<td>2020-10-04</td>
+<td>30</td>
+<td>7</td>
+</tr>
+</tbody></table>
+<p>根據上方商品主資料表選出業績表的商品，簡單說就是找出有業績的商品，此時書中說使用IN雖然不錯。但前面提到用連結會更好。</p>
+<figure class="highlight sql"><table><tr><td class="code"><pre><span class="line"><span class="keyword">SELECT</span> I.item_no <span class="keyword">FROM</span> Items I <span class="keyword">INNER</span> <span class="keyword">JOIN</span> SalesHistory SH <span class="keyword">ON</span> I.item_no = SH.item_no;</span><br></pre></td></tr></table></figure>
+
+<p>結果</p>
+<table>
+<thead>
+<tr>
+<th>item_no</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>10</td>
+</tr>
+<tr>
+<td>10</td>
+</tr>
+<tr>
+<td>20</td>
+</tr>
+<tr>
+<td>20</td>
+</tr>
+<tr>
+<td>30</td>
+</tr>
+<tr>
+<td>30</td>
+</tr>
+<tr>
+<td>30</td>
+</tr>
+</tbody></table>
+<p>由於是一對多連結，就會出現重複資料，若要將重複資料排除勢必使用DISTINCT那這樣就會執行到排序，所以書中說到最佳解答是使用EXISTS，如此一來就不會執行排序。</p>
+<figure class="highlight sql"><table><tr><td class="code"><pre><span class="line"><span class="keyword">SELECT</span> item_no <span class="keyword">FROM</span> Items I <span class="keyword">WHERE</span> <span class="keyword">EXISTS</span>(</span><br><span class="line">    <span class="keyword">SELECT</span> * <span class="keyword">FROM</span> SalesHistory SH <span class="keyword">WHERE</span> I.item_no = SH.item_no</span><br><span class="line">);</span><br></pre></td></tr></table></figure>
+
+<h2 id="於極值函數-MAX-MIN-使用索引值"><a href="#於極值函數-MAX-MIN-使用索引值" class="headerlink" title="於極值函數(MAX/MIN)使用索引值"></a>於極值函數(MAX/MIN)使用索引值</h2><p>SQL內建MAX跟MIN函數，使用時都會進行排序，但如果參數欄位已有索引值，就只需要掃描到該索引值，不需要搜尋整張表。</p>
+<figure class="highlight sql"><table><tr><td class="code"><pre><span class="line">這段會需要搜尋整張表格</span><br><span class="line"> <span class="keyword">SELECT</span> <span class="keyword">MAX</span>(item) <span class="keyword">FROM</span> Items</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight sql"><table><tr><td class="code"><pre><span class="line">這段可以使用到索引值</span><br><span class="line"> <span class="keyword">SELECT</span> <span class="keyword">MAX</span>(item_no) <span class="keyword">FROM</span> Items</span><br></pre></td></tr></table></figure>
+
+<p>由於item_no主鍵的索引值，所以效果更好，即時是複合索引值，只要有首欄位就能使用。雖然這種做法無法真的不排序，但至少可讓前半段搜尋變快，也能提高效率。</p>
+<h2 id="寫在WHERE的條件不寫在HAVING上"><a href="#寫在WHERE的條件不寫在HAVING上" class="headerlink" title="寫在WHERE的條件不寫在HAVING上"></a>寫在WHERE的條件不寫在HAVING上</h2><figure class="highlight sql"><table><tr><td class="code"><pre><span class="line"><span class="keyword">SELECT</span> sale_date, <span class="keyword">SUM</span>(quantity)</span><br><span class="line"><span class="keyword">FROM</span> SalesHistory </span><br><span class="line"><span class="keyword">GROUP</span> <span class="keyword">BY</span> sale_date <span class="keyword">HAVING</span> sale_date = <span class="string">&#x27;2007-10-01&#x27;</span>;</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight sql"><table><tr><td class="code"><pre><span class="line"><span class="keyword">SELECT</span> sale_date, <span class="keyword">SUM</span>(quantity)</span><br><span class="line"><span class="keyword">FROM</span> SalesHistory <span class="keyword">WHERE</span> sale_date = <span class="string">&#x27;2007-10-01&#x27;</span></span><br><span class="line"><span class="keyword">GROUP</span> <span class="keyword">BY</span> sale_date;</span><br></pre></td></tr></table></figure>
+
+<p>結果</p>
+<table>
+<thead>
+<tr>
+<th>sale_date</th>
+<th>sum(quantity)</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>2007-10-01</td>
+<td>17</td>
+</tr>
+</tbody></table>
+<p>從效能來看一定是後者，原因是第一個使用GROUP BY之後彙整進行排序與運算，所以減少列數，才能減輕排序時負擔。第二個就是WHERE條件可使用索引值。某種意義上，sale_date應該是基數非常高的欄位，所以只要有索引值，應該就能讓列數有效率減少。</p>
+<h4 id="GROUP-BY-以及-ORDER-BY使用索引值"><a href="#GROUP-BY-以及-ORDER-BY使用索引值" class="headerlink" title="GROUP BY 以及 ORDER BY使用索引值"></a>GROUP BY 以及 ORDER BY使用索引值</h4><p>這兩種方式雖然會執行排序，但只要在欄位上加上索引值，就能讓搜尋速度變快，尤其是UNIQUE索引值欄位，有些系統的規格更是能跳過排序。</p>
+<h2 id="索引值真的派得上用場嗎"><a href="#索引值真的派得上用場嗎" class="headerlink" title="索引值真的派得上用場嗎?"></a>索引值真的派得上用場嗎?</h2><p>一般來說資料表有一定規模後，通常就會有索引值。把索引值想像成C語言的指標陣列，意思就是比起搜尋規模較大的物件，搜尋較小的指標會更有效率。</p>
+<pre><code>1.不是索引越多越好，索引可以加快查詢速度，但注意它是以空間換取時間。
+
+2.懂的使用Explain來分析你的SQL索引性能解析，https://segmentfault.com/a/1190000008131735。
+
+3.索引不是建了就會使用。SELECT * FROM user WHERE sex = 0 ( 0 代表女生 )，答案是不一定，如果大部份的值都是女生，那 mysql 會用全掃，如果大部份值為男生，那 mysql 會用索引。
+
+4.連合索引的欄位順序，通常是由最左邊的欄位的才能使用。
+
+5.儘可能使用索引的排序。
+
+6.有時太多索引，反而會讓優化器混亂。</code></pre>
+<h4 id="加工索引值欄位"><a href="#加工索引值欄位" class="headerlink" title="加工索引值欄位"></a>加工索引值欄位</h4><figure class="highlight sql"><table><tr><td class="code"><pre><span class="line">// NO</span><br><span class="line"><span class="keyword">SELECT</span> * <span class="keyword">FROM</span> SomeTable <span class="keyword">WHERE</span> col_1 * <span class="number">1.1</span> &gt; <span class="number">100</span>;</span><br><span class="line"></span><br><span class="line">// OK</span><br><span class="line"><span class="keyword">SELECT</span> * <span class="keyword">FROM</span> SomeTable <span class="keyword">WHERE</span> col_1 &gt; <span class="number">100</span> / <span class="number">1.1</span></span><br></pre></td></tr></table></figure>
+
+<p>若於搜尋條件右側使用公式，就會用到索引值。因此可以改成下列方式。同樣的在左側使用函數就無法使用到索引值。</p>
+<figure class="highlight sql"><table><tr><td class="code"><pre><span class="line"><span class="keyword">SELECT</span> * <span class="keyword">FROM</span> SomeTable <span class="keyword">WHERE</span> <span class="keyword">SUBSTR</span>(col_1, <span class="number">1</span>, <span class="number">1</span>) = <span class="string">&#x27;a&#x27;</span>;</span><br></pre></td></tr></table></figure>
+
+<p>如果非要左邊進行運算，書中說到可以用函數索引，但這種方式很麻煩也不太建議。</p>
+<pre><code> 使用索引值時候，欄位最好是乾淨的。</code></pre>
+<h4 id="索引值欄位有NULL"><a href="#索引值欄位有NULL" class="headerlink" title="索引值欄位有NULL"></a>索引值欄位有NULL</h4><p>索引值有NULL是很難處理的，而且不同規格有不同處理的方式，這也是因為受到使用者使用IS NULL或是IS NOT NULL，<br>就無法使用索引值，或是NULL偏多的欄位無法使用索引的限制導致。此外該如何與IS NOT NULL同等條件使用索引值，可以使用下列方式</p>
+<figure class="highlight sql"><table><tr><td class="code"><pre><span class="line">IS NOT NULL 替代方案</span><br><span class="line"><span class="keyword">SELECT</span> * <span class="keyword">FROM</span> SomeTable <span class="keyword">WHERE</span> col_1 &gt; <span class="number">0</span>;</span><br></pre></td></tr></table></figure>
+
+<h4 id="使用否定型的情況"><a href="#使用否定型的情況" class="headerlink" title="使用否定型的情況"></a>使用否定型的情況</h4><p>列出否定型不會使用索引值</p>
+<ul>
+<li>&lt;&gt;</li>
+<li>!=</li>
+<li>NOT IN</li>
+</ul>
+<p>因此下列程式也無法取使用索引值。</p>
+<figure class="highlight sql"><table><tr><td class="code"><pre><span class="line"><span class="keyword">SELECT</span> * <span class="keyword">FROM</span> SomeTable <span class="keyword">WHERE</span> col_1 &lt;&gt; <span class="number">100</span>;</span><br></pre></td></tr></table></figure>
+
+<h4 id="使用OR的情況"><a href="#使用OR的情況" class="headerlink" title="使用OR的情況"></a>使用OR的情況</h4><p>假設col_1與col_2各有索引值情況，或者col_1,col_2有複合索引，使OR撰寫連結條件，就無法使用索引值，而且就算可以使用，搜尋效率也會比AND差。</p>
+<figure class="highlight sql"><table><tr><td class="code"><pre><span class="line"><span class="keyword">SELECT</span> * <span class="keyword">FROM</span> SomeTable <span class="keyword">WHERE</span> col_1 &gt; <span class="number">1</span> <span class="keyword">OR</span> col_2 = <span class="string">&#x27;abc&#x27;</span>;</span><br></pre></td></tr></table></figure>
+
+<h4 id="再複合索引下，欄位順序是錯誤的"><a href="#再複合索引下，欄位順序是錯誤的" class="headerlink" title="再複合索引下，欄位順序是錯誤的"></a>再複合索引下，欄位順序是錯誤的</h4><p>假設以(col_1,col_2,col_3)這個順序下建立索引值，建立索引值欄位順序就相對重要。</p>
+<figure class="highlight sql"><table><tr><td class="code"><pre><span class="line">O <span class="keyword">SELECT</span> * <span class="keyword">FROM</span> SomeTable <span class="keyword">WHERE</span> col_1 ＝ <span class="number">10</span> <span class="keyword">AND</span> col_2 = <span class="number">100</span> <span class="keyword">AND</span> col_3 = <span class="number">500</span>;</span><br><span class="line">O <span class="keyword">SELECT</span> * <span class="keyword">FROM</span> SomeTable <span class="keyword">WHERE</span> col_1 ＝ <span class="number">10</span> <span class="keyword">AND</span> col_2 = <span class="number">100</span>;</span><br><span class="line">X <span class="keyword">SELECT</span> * <span class="keyword">FROM</span> SomeTable <span class="keyword">WHERE</span> col_1 ＝ <span class="number">10</span> <span class="keyword">AND</span> col_3 = <span class="number">500</span>;</span><br><span class="line">X <span class="keyword">SELECT</span> * <span class="keyword">FROM</span> SomeTable <span class="keyword">WHERE</span> col_2 ＝ <span class="number">100</span> <span class="keyword">AND</span> col_3 = <span class="number">500</span>;</span><br></pre></td></tr></table></figure>
+
+<p>第一個欄位一定寫在開頭，順序不能錯亂。某些DB雖然可能順序錯誤情況也可以使用索引值，但是效能還是比順序正確時來得低。</p>
+<h4 id="使用後方一致或中間一致的LIKE"><a href="#使用後方一致或中間一致的LIKE" class="headerlink" title="使用後方一致或中間一致的LIKE"></a>使用後方一致或中間一致的LIKE</h4><figure class="highlight sql"><table><tr><td class="code"><pre><span class="line">X <span class="keyword">SELECT</span> * <span class="keyword">FROM</span> SomeTable <span class="keyword">WHERE</span> col_1 <span class="keyword">LIKE</span> <span class="string">&#x27;%10&#x27;</span> ;</span><br><span class="line">X <span class="keyword">SELECT</span> * <span class="keyword">FROM</span> SomeTable <span class="keyword">WHERE</span> col_1 <span class="keyword">LIKE</span> <span class="string">&#x27;%10%&#x27;</span> ;</span><br><span class="line">O <span class="keyword">SELECT</span> * <span class="keyword">FROM</span> SomeTable <span class="keyword">WHERE</span> col_1 <span class="keyword">LIKE</span> <span class="string">&#x27;10%&#x27;</span> ;</span><br></pre></td></tr></table></figure>
+
+<h4 id="會進行預設型態轉換"><a href="#會進行預設型態轉換" class="headerlink" title="會進行預設型態轉換"></a>會進行預設型態轉換</h4><p>下列是對字串類型的col_1設定條件的情況。</p>
+<figure class="highlight sql"><table><tr><td class="code"><pre><span class="line">X <span class="keyword">SELECT</span> * <span class="keyword">FROM</span> SomeTable <span class="keyword">WHERE</span> col_1 = <span class="number">10</span> ;</span><br><span class="line">O <span class="keyword">SELECT</span> * <span class="keyword">FROM</span> SomeTable <span class="keyword">WHERE</span> col_1 = <span class="string">&#x27;10&#x27;</span> ;</span><br><span class="line">O <span class="keyword">SELECT</span> * <span class="keyword">FROM</span> SomeTable <span class="keyword">WHERE</span> col_1 = <span class="keyword">CAST</span>(<span class="number">10</span>,<span class="keyword">AS</span> <span class="built_in">CHAR</span>(<span class="number">2</span>));</span><br></pre></td></tr></table></figure>
+
+<h2 id="減少中介資料表"><a href="#減少中介資料表" class="headerlink" title="減少中介資料表"></a>減少中介資料表</h2><p>SQL會將子查詢結果為新的資料表，也能在程式碼裡，像是操作原始資料表一般操作。這種高正交性讓SQL程式碼更加靈活，但若是大量使用中介資料也會造成性能下滑，所以盡可能減少中介資料。</p>
+<figure class="highlight sql"><table><tr><td class="code"><pre><span class="line"><span class="keyword">SELECT</span> * <span class="keyword">FROM</span>(</span><br><span class="line">     <span class="keyword">SELECT</span> sale_date, <span class="keyword">MAX</span>(quantity) <span class="keyword">AS</span> max_qty <span class="keyword">FROM</span> SalesHistory <span class="keyword">GROUP</span> <span class="keyword">BY</span> sale_date</span><br><span class="line">) TMP  &lt;-多餘的中介資料</span><br><span class="line"><span class="keyword">WHERE</span> max_qty &gt;= <span class="number">10</span>;</span><br></pre></td></tr></table></figure>
+
+<p>不過，要將彙整的結果設定條件，是不需要建立多餘中介資料，只需要使用下列HAVING陳述句。</p>
+<figure class="highlight sql"><table><tr><td class="code"><pre><span class="line"><span class="keyword">SELECT</span> sale_date, <span class="keyword">MAX</span>(quantity) <span class="keyword">AS</span> max_qty <span class="keyword">FROM</span> SalesHistory <span class="keyword">GROUP</span> <span class="keyword">BY</span> sale_date <span class="keyword">HAVING</span> <span class="keyword">MAX</span>(quantity) &gt;= <span class="number">10</span>;</span><br></pre></td></tr></table></figure>
+<p>HAVING會一邊執行，一邊進行彙整，所以會比建立中介資料表之後才執行WHERE更有效率，且可讀性比較好。</p>
+<h2 id="利用IN使用多個KEY時，將KEY整理在同一個位置"><a href="#利用IN使用多個KEY時，將KEY整理在同一個位置" class="headerlink" title="利用IN使用多個KEY時，將KEY整理在同一個位置"></a>利用IN使用多個KEY時，將KEY整理在同一個位置</h2><p>自從SQL-92之後，就內建許多列間比較的功能，所以=、&lt;、&gt;這類比較或IN的參數不僅可以是純量，還能是LIST。讓我們想想下列這種使用多個Key組成IN內容情況。</p>
+<figure class="highlight sql"><table><tr><td class="code"><pre><span class="line"><span class="keyword">SELECT</span> <span class="keyword">id</span>, state, city <span class="keyword">FROM</span> Address1 A1 </span><br><span class="line"><span class="keyword">WHERE</span> </span><br><span class="line"><span class="keyword">status</span> <span class="keyword">IN</span>(</span><br><span class="line">    <span class="keyword">SELECT</span> <span class="keyword">status</span> <span class="keyword">FROM</span> Address2 A2 <span class="keyword">WHERE</span> A1.id = A2.id      </span><br><span class="line">) <span class="keyword">AND</span> city <span class="keyword">IN</span> (</span><br><span class="line">    <span class="keyword">SELECT</span> city <span class="keyword">FROM</span> Address2 A2 <span class="keyword">WHERE</span> A1.id = A2.id      </span><br><span class="line">)</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight sql"><table><tr><td class="code"><pre><span class="line"><span class="keyword">SELECT</span> * <span class="keyword">FROM</span> Address1 A1 <span class="keyword">WHERE</span> <span class="keyword">id</span> || <span class="keyword">status</span> || city <span class="keyword">IN</span>(</span><br><span class="line">    <span class="keyword">SELECT</span> <span class="keyword">id</span> || state || city <span class="keyword">FROM</span> Address1 A2);</span><br><span class="line">)</span><br></pre></td></tr></table></figure>
+
+<p>如此一來既可將子查詢寫成非關聯式類型，還能將搜尋減少為一次，如果是支援列間比較DB，還能如下在IN的參數設定欄位組合。</p>
+<figure class="highlight sql"><table><tr><td class="code"><pre><span class="line"><span class="keyword">SELECT</span> * <span class="keyword">FROM</span> Address1 A1 <span class="keyword">WHERE</span> (<span class="keyword">id</span>, <span class="keyword">status</span>, city) <span class="keyword">IN</span>(</span><br><span class="line">    <span class="keyword">SELECT</span> <span class="keyword">id</span> , state , city <span class="keyword">FROM</span> Address1 A2);</span><br><span class="line">)</span><br></pre></td></tr></table></figure>
+
+<p>相較於合併字串，這個方法有兩個優點。其一是不用擔心連結的類型轉換，另一個需要加工欄位，所以可使用索引值。</p>
+<h2 id="先連結在彙整"><a href="#先連結在彙整" class="headerlink" title="先連結在彙整"></a>先連結在彙整</h2><p>當需要連結使用，盡可能先連結在彙整，才能省去建立中介資料的步驟。之所以能夠省略，全在於集合運算的連結屬於乘法，若具一對一或是一對多的關聯性<br>，列數不會在連結之際增加。</p>
+<h2 id="計畫性地使用視圖"><a href="#計畫性地使用視圖" class="headerlink" title="計畫性地使用視圖"></a>計畫性地使用視圖</h2><p>視圖是非常方便的工具，但如果隨便訂了複雜的視圖將使效能下降，尤其定義是圖的查詢含有下列運算時，SQL的效率將變得更差，執行速度也會出乎意料的下滑。</p>
+<h4 id="總結"><a href="#總結" class="headerlink" title="總結"></a>總結</h4><pre><code>1.在IN使用子查詢，可以利用EXISTS或改寫連結。
+2.使用索引值，基本上左邊是空白的。
+3.SQＬ雖然不需要明定排序部分，但有許多運算會偷偷執行排序，需多加留意。
+4.盡可能減少不需要的中介資料。
+5.趁早撰寫能減少紀錄筆數的條件。</code></pre>
+<p>參考資料: </p>
+<p>1.SQL 達人的工作現場攻略筆</p>
+<p>2.<a href="https://ithelp.ithome.com.tw/articles/10221971">https://ithelp.ithome.com.tw/articles/10221971</a></p>
+]]></content>
+      <categories>
+        <category>SQL</category>
+      </categories>
+  </entry>
+  <entry>
+    <title>SQL 達人的工作現場攻略筆記 - CH-18 GROUP BY 與 PARTITION BY</title>
+    <url>/2021/01/17/sql/202101172100/</url>
+    <content><![CDATA[<h4 id="大家了解兩者的差異嗎"><a href="#大家了解兩者的差異嗎" class="headerlink" title="大家了解兩者的差異嗎?"></a>大家了解兩者的差異嗎?</h4><ul>
+<li><p>group by：對檢索結果的保留行進行單純分組，返回聚合之後的組的數據統計值的記錄。劃分為多組，每組返回一行。</p>
+</li>
+<li><p>partition by：返回分組裡的每一條數據，在應用關聯的視窗函數前確定行集的分區和排序，然後，視窗函數將計算每一行的值。</p>
+</li>
+</ul>
+<p>SQL篩選各種資料時，最基本操作就是某種準備替資料分組。其實除了使用SQL之外，日常生活中整理資料、查詢資料時，替資料建群組。</p>
+<p>而在SQL中具有建立群組功能就是GROUP BY跟PARTITION BY。這兩種方式都能利用資料表指定的KEY來分割資料，而兩者不同地方在於GROUP BY會再分割後，將資料彙整為1列，而PARTITION BY是將每一欄位取出整理。</p>
+<p>透過下列團隊成員資料表說明兩者差異。</p>
+<p>Teams</p>
+<table>
+<thead>
+<tr>
+<th>member</th>
+<th>team</th>
+<th>age</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>郁文</td>
+<td>A</td>
+<td>28</td>
+</tr>
+<tr>
+<td>瑋乃</td>
+<td>A</td>
+<td>19</td>
+</tr>
+<tr>
+<td>銘仁</td>
+<td>A</td>
+<td>23</td>
+</tr>
+<tr>
+<td>靚儀</td>
+<td>B</td>
+<td>40</td>
+</tr>
+<tr>
+<td>勝朋</td>
+<td>B</td>
+<td>29</td>
+</tr>
+<tr>
+<td>美美</td>
+<td>C</td>
+<td>30</td>
+</tr>
+<tr>
+<td>建國</td>
+<td>D</td>
+<td>28</td>
+</tr>
+<tr>
+<td>崇恩</td>
+<td>D</td>
+<td>28</td>
+</tr>
+<tr>
+<td>連雅</td>
+<td>D</td>
+<td>24</td>
+</tr>
+<tr>
+<td>光城</td>
+<td>D</td>
+<td>22</td>
+</tr>
+</tbody></table>
+<p>若以GROUP BY與PARTITION BY處理這張資料表，可寫出取得團隊資訊的查詢。不管使用哪個陳述句，Teams資料表都會先分割部分集合，再以SUM函數彙整或RANK排出順位。</p>
+<figure class="highlight sql"><table><tr><td class="code"><pre><span class="line"><span class="keyword">SELECT</span> <span class="keyword">member</span>,team,age,</span><br><span class="line"><span class="keyword">RANK</span>() <span class="keyword">OVER</span>(<span class="keyword">PARTITION</span> <span class="keyword">BY</span> team <span class="keyword">ORDER</span> <span class="keyword">BY</span> age <span class="keyword">DESC</span>) rn,</span><br><span class="line"><span class="keyword">DENSE_RANK</span>()  <span class="keyword">OVER</span>(<span class="keyword">PARTITION</span> <span class="keyword">BY</span> team <span class="keyword">ORDER</span> <span class="keyword">BY</span> age <span class="keyword">DESC</span>) dense_rn,</span><br><span class="line">ROW_NUMBER()  <span class="keyword">OVER</span>(<span class="keyword">PARTITION</span> <span class="keyword">BY</span> team <span class="keyword">ORDER</span> <span class="keyword">BY</span> age <span class="keyword">DESC</span>) row_num</span><br><span class="line"><span class="keyword">FROM</span> Teams</span><br><span class="line"><span class="keyword">ORDER</span> <span class="keyword">BY</span> team, rn</span><br></pre></td></tr></table></figure>
+
+<p>結果</p>
+<table>
+<thead>
+<tr>
+<th>member</th>
+<th>team</th>
+<th>age</th>
+<th>rn</th>
+<th>dense_rn</th>
+<th>row_num</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>郁文</td>
+<td>A</td>
+<td>28</td>
+<td>1</td>
+<td>1</td>
+<td>1</td>
+</tr>
+<tr>
+<td>銘仁</td>
+<td>A</td>
+<td>23</td>
+<td>2</td>
+<td>2</td>
+<td>2</td>
+</tr>
+<tr>
+<td>瑋乃</td>
+<td>A</td>
+<td>19</td>
+<td>3</td>
+<td>3</td>
+<td>3</td>
+</tr>
+<tr>
+<td>靚儀</td>
+<td>B</td>
+<td>40</td>
+<td>1</td>
+<td>1</td>
+<td>1</td>
+</tr>
+<tr>
+<td>勝朋</td>
+<td>B</td>
+<td>29</td>
+<td>2</td>
+<td>2</td>
+<td>2</td>
+</tr>
+<tr>
+<td>美美</td>
+<td>C</td>
+<td>30</td>
+<td>1</td>
+<td>1</td>
+<td>1</td>
+</tr>
+<tr>
+<td>建國</td>
+<td>D</td>
+<td>28</td>
+<td>1</td>
+<td>1</td>
+<td>1</td>
+</tr>
+<tr>
+<td>崇恩</td>
+<td>D</td>
+<td>28</td>
+<td>1</td>
+<td>1</td>
+<td>2</td>
+</tr>
+<tr>
+<td>連雅</td>
+<td>D</td>
+<td>24</td>
+<td>3</td>
+<td>2</td>
+<td>3</td>
+</tr>
+<tr>
+<td>光城</td>
+<td>D</td>
+<td>22</td>
+<td>4</td>
+<td>3</td>
+<td>4</td>
+</tr>
+</tbody></table>
+<p>根據書中 286 頁圖片，使用圖形代表集合，是為了呈現分割，經過仔細觀察後發現</p>
+<pre><code>每一個都不是空集合
+部分集合總和等於分割前的集合
+隨機從中挑選兩個集合出來，不會有共通得部分。</code></pre>
+<p>由於部分集合本來就是從資料表分割而來，所以不會有空集合，且部分集合的總和當然會是分割之的母體集合，所以不會有成員因為分割而失蹤。此外也不會有同時屬於兩個部分集合的成員。每一位成員必然隸屬一個集合。也就是說 GROUP BY與PARTITION BY 可將各成員分割至團隊得函數。</p>
+<h4 id="結論"><a href="#結論" class="headerlink" title="結論"></a>結論</h4><p>SQL與RDB採用許多集合論以及群的成果，或許內容有點抽象，但也因為抽象內容，所以才廣泛應用。</p>
+<p>參考資料: </p>
+<p>1.SQL 達人的工作現場攻略筆</p>
+]]></content>
+      <categories>
+        <category>SQL</category>
+      </categories>
+  </entry>
+  <entry>
+    <title>菜鳥工程師👨‍💻</title>
+    <url>/2020/11/10/unitTest/202011121830/</url>
+    <content><![CDATA[<h1 id="菜鳥工程師👨‍💻"><a href="#菜鳥工程師👨‍💻" class="headerlink" title="菜鳥工程師👨‍💻"></a>菜鳥工程師👨‍💻</h1><h5 id="第一篇日記"><a href="#第一篇日記" class="headerlink" title="第一篇日記"></a>第一篇日記</h5><p>&nbsp;&nbsp;大學畢業後馬上擔任網頁後端工程師，在職中也有繼續就讀碩士班，不斷充實自己，雖說年資不久但也經歷過許多大小事情，希望藉此透過部落格來撰寫工程師歷程心得:D。</p>
+]]></content>
+      <categories>
+        <category>部落格</category>
+      </categories>
+  </entry>
+  <entry>
+    <title>單元測試的藝術 第二版 - 01 單元測試藝術</title>
+    <url>/2021/03/06/unitTest/202103061655/</url>
+    <content><![CDATA[<h2 id="單元測試基礎"><a href="#單元測試基礎" class="headerlink" title="單元測試基礎"></a>單元測試基礎</h2><h4 id="1-1-逐步定義單元測試"><a href="#1-1-逐步定義單元測試" class="headerlink" title="1.1 逐步定義單元測試"></a>1.1 逐步定義單元測試</h4><p>在軟體開發領域上，單元測試並非一個概念，從1970年代使用過的測試設計程式時，單元測試就已經出現了，而Kent Beck在Smalltalk中加入單元測試概念，這個概念也帶入到許多程式語言上。<br>而單元測試的定義上需要定義的更好一些。</p>
+<pre><code>定義1.0 一個單元測試就是一段程式碼，這段程式碼呼叫另一個程式碼，
+然後驗證某些假設性問題正確性。如果驗證錯誤，則單元測試就會失敗，
+一個單元可以是一個方法或函數。</code></pre>
+<p>被你的測試程式所測試的對象，稱之為(被測試系統)(System Under Test SUT)。</p>
+<pre><code>定義
+從呼叫系統一個公開方法，到產生一個測試可見最終結果，在期間系統所發生的行為統稱為一個
+工作單元。所謂一個可見最終結果指的是，我們只需要透過系統的公共API和行為就可以觀察，
+而不需要透過系統內部狀態才能得知結果。一個最終結果可以以下其中的形式：
+* 被呼叫的公開方法回傳一個結果值(一個非回傳void函數)。
+* 被呼叫方法的前後，系統可見的狀態或行為發生變化，這樣的變化不需要透過查詢私有狀態就能取得與判斷。
+* 呼叫一個不受測試所控制的第三方系統，這個第三方系統並不回傳任何值。</code></pre>
+<p>工作單元這個概念意味著一個單元，它既可以小到只包含一個方法，也可以大到包括某個功能。</p>
+<pre><code>一個單元測試是一段呼叫一個工作單元，並驗證工作單元的一個具體結果。
+如果對這個結果假設是錯誤的，那單元就是失敗了。</code></pre>
+<p>不管是哪個程式語言，在定義單元測試時，最難的事情之一，就是定義何謂優秀的單元測試。</p>
+<h5 id="1-1-1-撰寫優秀的單元測試"><a href="#1-1-1-撰寫優秀的單元測試" class="headerlink" title="1.1.1 撰寫優秀的單元測試"></a>1.1.1 撰寫優秀的單元測試</h5><p>大部分嘗試對自己程式進行單元測試的人，都會在某個階段就放棄，也會有在產品生命週期後期，依賴系統測試或整合測試來發現問題，或是客製化出一些用來進行測試的系統，然後手動測試。以及寫出的單元測試品質很差，那一點意義也沒有。那乾脆不要寫測試，至少省掉日後維護得成本和時間。透過定義什麼叫做優秀的單元測試，得暸解開發人員在測試上做些什麼。</p>
+<h5 id="1-1-2-我們都寫過的單元測試"><a href="#1-1-2-我們都寫過的單元測試" class="headerlink" title="1.1.2 我們都寫過的單元測試"></a>1.1.2 我們都寫過的單元測試</h5><p>傳統測試開發人員透過一個圖形介面來觸發測試的某個行為，接著驗證結果，這測試也許有用，且也接近於傳統定義的單元測試，但它和書中所定義優秀的單元測試還有很大的距離。</p>
+<h4 id="1-2-優秀的單元測試特質"><a href="#1-2-優秀的單元測試特質" class="headerlink" title="1.2 優秀的單元測試特質"></a>1.2 優秀的單元測試特質</h4><p>單元測試應該具備特質:</p>
+<ul>
+<li>自動化，且可以重複執行。</li>
+<li>容易實現。</li>
+<li>第二天應該還有存在意義。</li>
+<li>任何人可以執行它。</li>
+<li>執行速度快。</li>
+<li>執行結果一致。</li>
+<li>完全掌握被測試的單元。</li>
+<li>完全被隔離的(執行時獨立於其他測試)</li>
+<li>執行結果失敗，應該要簡單清楚呈現我們的期望，發生問題原因在哪。</li>
+</ul>
+<h4 id="1-3-整合測試"><a href="#1-3-整合測試" class="headerlink" title="1.3 整合測試"></a>1.3 整合測試</h4><p>任何測試，假設測試執行速度不夠快，結果不穩定，或是被測試單元要用一個到多個真實相依物件，作者認為他就是一種整合測試。例如:一個測試需要用到系統真實的時間、真實的檔案系統或是真實的資料庫，那這個測試就是屬於整合測試。這種測試本身並不是壞事，只是應該被分開，營造出一種綠色安全區域。以及整合測試帶來另個問題就是，一次測試太多東西。</p>
+<p>更好的整合測試定義</p>
+<pre><code>整合測試是對一個工作單元進行測試，而這個測試對被測試單元並沒有完全的控制，而是使用該單元一個或多個真實依賴相依物件，例如時間、網路、資料庫等，</code></pre>
+<p>總體來說，整合測試實際使用真實相依物件或資源，而單元測試則是把被測試單元與其他相依物件或資源隔離開來，以保證單元測試結果高度穩定。</p>
+<h5 id="1-3-1-與自動化單元測試相比，非自動化整合測試的缺點"><a href="#1-3-1-與自動化單元測試相比，非自動化整合測試的缺點" class="headerlink" title="1.3.1 與自動化單元測試相比，非自動化整合測試的缺點"></a>1.3.1 與自動化單元測試相比，非自動化整合測試的缺點</h5><ul>
+<li><p>我兩週前寫的單元測試，今天還能正常執行結果嗎?幾個月前寫的呢?幾年前寫的?</p>
+<p>如果回答不能。那你怎麼知道自己是不是已經破壞了以前完成某個功能呢?程式碼會一直變化，你不能對之前所有功能進行測試，當然就可能發生改壞東西狀況。書中說明這是不經意的bug。</p>
+<p>回歸:是以前運作正常但現在無法正常運作的一個或多個工作單元。</p>
+</li>
+<li><p>我兩個月前所寫的單元測試，我團隊中任何一個人是否都能夠執行它並得到結果?</p>
+<p>這個問題是上一個問題進階版，當你對程式碼做任何修改，需要保證自己沒有弄壞別人的程式與功能。許多人開發人員害怕修改以前系統中遺留的程式碼，就是因為擔心改壞，以及修改完系統不是穩定的。優秀單元測試總是可以被任何人所存取修改。</p>
+<p>遺留的程式碼:維基百科中定義為一段作業系統或其他電腦科技不再支援或製造的程式碼，但很多公司把任何比目前版本老舊程式碼都稱之為遺留程式碼。此名稱形容難以維護、難以測試以及難以閱讀。</p>
+</li>
+<li><p>我能在幾分鐘跑完所有單元測試嗎?</p>
+<p>如果你不能很快地執行完所有測試(在幾秒鐘內完成，比起幾分鐘才能完成要好得多)，你就不會經常執行它們。問題是，如果修改程式，你想盡早回饋確保自己沒弄壞什麼功能。當執行測試週期越長，你對系統未經測試的修改越多，出現問題時可能的原因點就越多。</p>
+<p>優秀的單元測試執行速度應該很快。</p>
+</li>
+<li><p>我能一鍵執行所有我寫過的單元測試嗎?</p>
+<p>如果不能，那意味你可能需要對執行測試機器進行一些設定，才能讓測試能正常執行，或是你的測試並非完全自動化。如果不能將單元測試自動化，你可能每次重複測試的時候，跳過這些沒被自動化的測試程式。</p>
+<p>優秀的測試無需進行額外手動的設定或處理，就能被自動執行。</p>
+</li>
+<li><p>我能在幾分鐘寫出一個基本單元測試嗎？</p>
+<p>單元測試其中一個特色，就是測試出每個問題細節，而不是關注於大問題。當你只關注較大的問題，測試的邏輯覆蓋率就會比較低，程式碼中很多核心邏輯不會被測試到，這樣就可能出現未曾可慮到的bug，一旦你已經發現適合測試你的物件模型的模式後，優秀的單元測試，應該要很容易，很快速被撰寫完。一個小警告:面對一個沒有被單元測試保護的物件模型，即便是有經驗的單元測試人員，也需要花上30分鐘或更長時間撰寫出第一個好的單元測試。</p>
+</li>
+</ul>
+<h4 id="1-4-什麼是優秀的單元測試"><a href="#1-4-什麼是優秀的單元測試" class="headerlink" title="1.4 什麼是優秀的單元測試"></a>1.4 什麼是優秀的單元測試</h4><p>一個單元測試是一段自動化程式碼，這段程式會呼叫被測試的工作單元，之後對這個單元的單一最終結得某些假設或期望進行驗證。單元測試幾乎都是靠使用單元測試框架進行撰寫。單元測試可靠、易讀、易維護。只要產品程式碼不發生變化，單元測試執行結果是穩定一致。</p>
+<p>作者說:前一版本只針對控制流程屬於單元的一部分，但作者現在不這麼認為。沒有邏輯判斷程式碼通常屬於工作單元的一部分。</p>
+<pre><code>控制程式碼:通常包含某種邏輯，無論是規模有多小。控制流程程式碼包含下面列舉:if語句、loop或switch或case語句。</code></pre>
+<p>參考資料: </p>
+<p>1.單元測試的藝術 第二版</p>
+]]></content>
+      <categories>
+        <category>單元測試</category>
+      </categories>
+  </entry>
+</search>
