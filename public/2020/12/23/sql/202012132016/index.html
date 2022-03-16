@@ -28,9 +28,9 @@
 <meta property="og:description" content="前言 SQL 的效能一直是 DB 工程師必須面對的主要課程之一，甚至有些人認為是唯一的課題。此章節是改善 SQL 的效能，讓執行速度更快減少更多資源。  使用效率的搜尋 若子查詢為參數 使用(EXISTS)代替(IN)，在 IN 述詞很方便，也很好讀，但卻會遇到效能瓶頸的問題，若當 IN 參數(1,2,3)這種 List 時繼就不需要改寫，但如果以子查詢為參數就必須要注意，通常 NOT IN 跟">
 <meta property="og:locale" content="zh_TW">
 <meta property="article:published_time" content="2020-12-23T12:16:00.000Z">
-<meta property="article:modified_time" content="2022-01-12T13:28:10.511Z">
-<meta property="article:author" content="luezero">
-<meta property="article:tag" content="zero|code|power">
+<meta property="article:modified_time" content="2022-03-16T13:14:46.678Z">
+<meta property="article:author" content="LueZero">
+<meta property="article:tag" content="資料庫">
 <meta name="twitter:card" content="summary">
 
 <link rel="canonical" href="https://luezero.github.io/2020/12/23/sql/202012132016/">
@@ -199,7 +199,7 @@
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="image" content="/images/1.jpeg">
-      <meta itemprop="name" content="luezero">
+      <meta itemprop="name" content="LueZero">
       <meta itemprop="description" content="">
     </span>
 
@@ -225,7 +225,7 @@
                   <i class="far fa-calendar-check"></i>
                 </span>
                 <span class="post-meta-item-text">更新於</span>
-                <time title="修改時間：2022-01-12 21:28:10" itemprop="dateModified" datetime="2022-01-12T21:28:10+08:00">2022-01-12</time>
+                <time title="修改時間：2022-03-16 21:14:46" itemprop="dateModified" datetime="2022-03-16T21:14:46+08:00">2022-03-16</time>
               </span>
             <span class="post-meta-item">
               <span class="post-meta-item-icon">
@@ -233,7 +233,7 @@
               </span>
               <span class="post-meta-item-text">分類於</span>
                 <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/SQL/" itemprop="url" rel="index"><span itemprop="name">SQL</span></a>
+                  <a href="/categories/%E8%B3%87%E6%96%99%E5%BA%AB/" itemprop="url" rel="index"><span itemprop="name">資料庫</span></a>
                 </span>
             </span>
 
@@ -563,6 +563,9 @@
     
 
       <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/%E8%B3%87%E6%96%99%E5%BA%AB/" rel="tag"># 資料庫</a>
+          </div>
 
         
 
@@ -641,9 +644,9 @@
 
       <div class="site-overview-wrap sidebar-panel">
         <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
-    <img class="site-author-image" itemprop="image" alt="luezero"
+    <img class="site-author-image" itemprop="image" alt="LueZero"
       src="/images/1.jpeg">
-  <p class="site-author-name" itemprop="name">luezero</p>
+  <p class="site-author-name" itemprop="name">LueZero</p>
   <div class="site-description" itemprop="description"></div>
 </div>
 <div class="site-state-wrap motion-element">
@@ -656,8 +659,16 @@
         </a>
       </div>
       <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
         <span class="site-state-item-count">4</span>
-        <span class="site-state-item-name">分類</span>
+        <span class="site-state-item-name">分類</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">4</span>
+        <span class="site-state-item-name">標籤</span></a>
       </div>
   </nav>
 </div>
@@ -695,7 +706,7 @@
   <span class="with-love">
     <i class="fa fa-heart"></i>
   </span>
-  <span class="author" itemprop="copyrightHolder">luezero</span>
+  <span class="author" itemprop="copyrightHolder">LueZero</span>
 </div>
   <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://pisces.theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Pisces</a> 強力驅動
   </div>

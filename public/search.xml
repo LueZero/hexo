@@ -11,8 +11,304 @@
 <p>&nbsp;&nbsp;&nbsp;&nbsp;小結:其實簡單寫法是為了讓複雜程式碼更簡單更好閱讀，雖說沒有一定準則但是能讓程式碼更短不是好嗎。</p>
 ]]></content>
       <categories>
-        <category>程式</category>
+        <category>php</category>
       </categories>
+      <tags>
+        <tag>php</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>SQL 達人的工作現場攻略筆記 - CH-3 自我連結使用方式</title>
+    <url>/2020/11/17/sql/202011172350/</url>
+    <content><![CDATA[<h4 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h4><p>SQL 提供連結會依照特徵命名，分別為<strong>內部連結</strong>、<strong>外部連結</strong>、<strong>交叉連結</strong>這些，且這些連結通常會以不同的資料表為對象，但 SQL 並未禁止同一張表用連結，此時在同一張資料表套用連結稱為<strong>自我連結 self join</strong>。</p>
+<h4 id="一、重複排序、排列、結合"><a href="#一、重複排序、排列、結合" class="headerlink" title="一、重複排序、排列、結合"></a>一、重複排序、排列、結合</h4><p>假設有張表商品與價錢資料表、其中共有蘋果、橘子、香蕉三筆記錄不得不製作業績表時候，必須取得商品組合。</p>
+<table>
+<thead>
+<tr>
+<th>name(產品名稱)</th>
+<th>price (價錢)</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>蘋果</td>
+<td>100</td>
+</tr>
+<tr>
+<td>橘子</td>
+<td>50</td>
+</tr>
+<tr>
+<td>香蕉</td>
+<td>80</td>
+</tr>
+</tbody></table>
+<p>說是組合其實組合的種類有兩種，一種是重視的排列順序<strong>有序數對</strong>(ordered pair)，另一種是不重視順序的<strong>無序數對</strong>(unordered pair)。要建立有序數對非常簡單，例如:</p>
+<figure class="highlight sql"><table><tr><td class="code"><pre><span class="line">建立重複排序SQL</span><br><span class="line"><span class="keyword">SELECT</span> P1.name <span class="keyword">AS</span> name_1, P2.name <span class="keyword">AS</span> name_2　</span><br><span class="line"><span class="keyword">FROM</span> Products P1 <span class="keyword">CROSS</span> <span class="keyword">JOIN</span> Products P2;</span><br></pre></td></tr></table></figure>
+
+<p>結果:</p>
+<table>
+<thead>
+<tr>
+<th>name_1</th>
+<th>name_2</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>蘋果</td>
+<td>蘋果</td>
+</tr>
+<tr>
+<td>蘋果</td>
+<td>橘子</td>
+</tr>
+<tr>
+<td>蘋果</td>
+<td>香蕉</td>
+</tr>
+<tr>
+<td>橘子</td>
+<td>蘋果</td>
+</tr>
+<tr>
+<td>橘子</td>
+<td>橘子</td>
+</tr>
+<tr>
+<td>橘子</td>
+<td>香蕉</td>
+</tr>
+<tr>
+<td>香蕉</td>
+<td>蘋果</td>
+</tr>
+<tr>
+<td>香蕉</td>
+<td>橘子</td>
+</tr>
+<tr>
+<td>香蕉</td>
+<td>香蕉</td>
+</tr>
+</tbody></table>
+<p>交叉連接為兩個資料表間的笛卡兒乘積 (Cartesian product)，兩個資料表在結合時，不指定任何條件，即將兩個資料表中所有的可能排列組合出來。可以看到這種連結方式出現很多多餘的組合，這都是因為重視順序的集合，此外也可以將交叉連結寫成以下方式‧</p>
+<figure class="highlight sql"><table><tr><td class="code"><pre><span class="line">交叉連結另一種寫法</span><br><span class="line"><span class="keyword">SELECT</span> P1.name <span class="keyword">AS</span> name_1, P2.name <span class="keyword">AS</span> name_2　</span><br><span class="line"><span class="keyword">FROM</span> Products P1, Products P2;</span><br></pre></td></tr></table></figure>
+
+<p>此時作者卻說這種語法不要使用，原因是因為希望執行設有連結條件的內部連結，卻有可能忘記撰寫連結條件而變成交叉連結，產生預料之外的結果，交叉連結會消耗少不資源。接著將程式碼改寫成排除多餘的集合內容。首先排除(蘋果，蘋果)這種元素組合。</p>
+<figure class="highlight sql"><table><tr><td class="code"><pre><span class="line">取得排列SQL</span><br><span class="line"><span class="keyword">SELECT</span> P1.name <span class="keyword">AS</span> name_1, P2.name <span class="keyword">AS</span> name_2　</span><br><span class="line"><span class="keyword">FROM</span> Products P1 <span class="keyword">INNER</span> <span class="keyword">JOIN</span> Products P2 <span class="keyword">ON</span> P1.name &lt;&gt; P2.name;</span><br></pre></td></tr></table></figure>
+
+<p>結果:</p>
+<table>
+<thead>
+<tr>
+<th>name_1</th>
+<th>name_2</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>蘋果</td>
+<td>橘子</td>
+</tr>
+<tr>
+<td>蘋果</td>
+<td>香蕉</td>
+</tr>
+<tr>
+<td>橘子</td>
+<td>蘋果</td>
+</tr>
+<tr>
+<td>橘子</td>
+<td>香蕉</td>
+</tr>
+<tr>
+<td>香蕉</td>
+<td>蘋果</td>
+</tr>
+<tr>
+<td>香蕉</td>
+<td>橘子</td>
+</tr>
+</tbody></table>
+<blockquote>
+<p>ಠ_ಠ CROSS JOIN mysql 是舊版可能不支援此寫法，就會有使用 FROM table1,table2 方式。</p>
+</blockquote>
+<p>早期語法可能使用下列，但只要錯誤一步就有可能會寫成剛剛的交叉連結，所以盡可能不要使用此寫法。原因是因為忘記加上 WHERE 條件就會執行交叉連結，但若是使用 INNER JOIN 的語法就算忘記大部的 DBMS 都會視為語法錯誤。</p>
+<figure class="highlight sql"><table><tr><td class="code"><pre><span class="line">取得排列SQL</span><br><span class="line"><span class="keyword">SELECT</span> P1.name <span class="keyword">AS</span> name_1, P2.name <span class="keyword">AS</span> name_2　</span><br><span class="line"><span class="keyword">FROM</span> Products P1, Products P2</span><br><span class="line"><span class="keyword">WHERE</span> P1.name &lt;&gt; P2.name;</span><br></pre></td></tr></table></figure>
+
+<p>這裡說明如果上面忘記轉寫條件又會變成交叉連結，但使用 INNER JOIN 方式忘記寫條件系統就會噴錯，算是一種安全的寫法。接下來作者叫我們嘗試排除(蘋果、橘子)與(橘子、蘋果)這種只是調換順序組合。</p>
+<figure class="highlight sql"><table><tr><td class="code"><pre><span class="line">取得組合SQL</span><br><span class="line"><span class="keyword">SELECT</span> P1.name <span class="keyword">AS</span> name_1, P2.name <span class="keyword">AS</span> name_2</span><br><span class="line">  <span class="keyword">FROM</span> Products P1</span><br><span class="line">  <span class="keyword">INNER</span> <span class="keyword">JOIN</span> Products P2 <span class="keyword">ON</span> P1.name &gt; P2.name</span><br></pre></td></tr></table></figure>
+
+<p>結果:</p>
+<table>
+<thead>
+<tr>
+<th>name_1</th>
+<th>name_2</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>蘋果</td>
+<td>橘子</td>
+</tr>
+<tr>
+<td>香蕉</td>
+<td>橘子</td>
+</tr>
+<tr>
+<td>香蕉</td>
+<td>蘋果</td>
+</tr>
+</tbody></table>
+<p>若想取得三種以上得組合，只需將程式碼改成以下內容。</p>
+<figure class="highlight sql"><table><tr><td class="code"><pre><span class="line">取得組合SQL 擴充三欄位版本</span><br><span class="line"><span class="keyword">SELECT</span> P1.name <span class="keyword">AS</span> name_1,</span><br><span class="line">       P2.name <span class="keyword">AS</span> name_2,　</span><br><span class="line">       P3.name <span class="keyword">AS</span> name_3,</span><br><span class="line">  <span class="keyword">FROM</span> Products P1</span><br><span class="line">  <span class="keyword">INNER</span> <span class="keyword">JOIN</span> Products P2 <span class="keyword">ON</span> P1.name &gt; P2.name</span><br><span class="line">  <span class="keyword">INNER</span> <span class="keyword">JOIN</span> Products P3 <span class="keyword">ON</span> P2.name &gt; P3.name;</span><br></pre></td></tr></table></figure>
+
+<p>結果:</p>
+<table>
+<thead>
+<tr>
+<th>name_1</th>
+<th>name_2</th>
+<th>name_3</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>蘋果</td>
+<td>橘子</td>
+<td>香蕉</td>
+</tr>
+</tbody></table>
+<p>除了例題使用的=之外，使用&gt;、&lt;、&lt;&gt;這種比較運算子連結稱為<strong>非等值連結</strong>。這種連結與自我連結一起使用也稱為<strong>自我非等值連結</strong>。這種一般來說不太會在商業邏輯使用，但會建立在欄位組合使用。</p>
+<h4 id="二、刪除重複列"><a href="#二、刪除重複列" class="headerlink" title="二、刪除重複列"></a>二、刪除重複列</h4><p>在關聯式資料世界裡，重複列與 NULL 差不多是令人討厭，所以也有許多排列重複列的方法因此問世。用剛剛產品資料表例子，試著排除重複出現橘子，而這張表沒有設定Key。</p>
+<figure class="highlight sql"><table><tr><td class="code"><pre><span class="line">刪除重複列SQL</span><br><span class="line"><span class="keyword">DELETE</span> <span class="keyword">FROM</span> Products P1</span><br><span class="line"><span class="keyword">WHERE</span> <span class="keyword">rowid</span> &lt; (<span class="keyword">SELECT</span> <span class="keyword">MAX</span>(P2.rowid)</span><br><span class="line"><span class="keyword">FROM</span> Products P2 <span class="keyword">WHERE</span> P1.name = P2.name <span class="keyword">AND</span> P1.price = P2.price);</span><br></pre></td></tr></table></figure>
+
+<p>這裡使用方式是虛擬欄位去取得列的編號因為這張表沒有設定Key關係，而在mysql中是名稱是使用_rowid，<br>在SQL裡擁有不同名稱的集合被當成不同的集合，即使物理層級相同的存在，在邏輯層級仍屬於不同的存在。</p>
+<h4 id="三、部分不一致的-Key-搜尋"><a href="#三、部分不一致的-Key-搜尋" class="headerlink" title="三、部分不一致的 Key 搜尋"></a>三、部分不一致的 Key 搜尋</h4><table>
+<thead>
+<tr>
+<th>name(姓名)</th>
+<th>family_id(家庭 ID)</th>
+<th>address(地址)</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>許郁文</td>
+<td>100</td>
+<td>台北市萬華區長泰街 3-2-29</td>
+</tr>
+<tr>
+<td>許美美</td>
+<td>100</td>
+<td>台北市萬華區長泰街 3-2-92</td>
+</tr>
+<tr>
+<td>張瑋礽</td>
+<td>200</td>
+<td>台北市中正區南海路 2-8-1</td>
+</tr>
+<tr>
+<td>張銘仁</td>
+<td>200</td>
+<td>台北市中正區南海路 2-8-1</td>
+</tr>
+<tr>
+<td>Holmes</td>
+<td>300</td>
+<td>貝克街 221B</td>
+</tr>
+<tr>
+<td>Watson</td>
+<td>400</td>
+<td>貝克街 221B</td>
+</tr>
+</tbody></table>
+<p>接下來將下列聯絡人資料表為例。主 Key 是人名，同一家族的人使用相同家族 ID，基本上同一家人會有相同的地址，但也有像是 Holmes 跟 Watson 這種還不是家人卻同居的情侶，書中是說將目光放在許家夫妻上，這兩個人並不是分居而是地址有誤，以這種情況如何篩選出是同一家人但地址卻不一致的紀錄呢?</p>
+<figure class="highlight sql"><table><tr><td class="code"><pre><span class="line">搜尋同一家人，地址不同的SQL</span><br><span class="line"><span class="keyword">SELECT</span> <span class="keyword">DISTINCT</span> A1.name,A1.address</span><br><span class="line"><span class="keyword">FROM</span> Address A1 <span class="keyword">INNER</span> <span class="keyword">JOIN</span> Address A2 <span class="keyword">ON</span> A1.family_id = A2.family_id</span><br><span class="line"><span class="keyword">AND</span> A1.address &lt;&gt; A2.address;</span><br></pre></td></tr></table></figure>
+
+<blockquote>
+<p>方法有很多種但如果是自我非等值連結撰寫，就能將程式碼寫得很簡潔。</p>
+</blockquote>
+<p>從下面商品資料表找出相同價格商品</p>
+<table>
+<thead>
+<tr>
+<th>name(商品名稱)</th>
+<th>price(價格)</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>蘋果</td>
+<td>50</td>
+</tr>
+<tr>
+<td>橘子</td>
+<td>100</td>
+</tr>
+<tr>
+<td>葡萄</td>
+<td>50</td>
+</tr>
+<tr>
+<td>西瓜</td>
+<td>80</td>
+</tr>
+<tr>
+<td>檸檬</td>
+<td>30</td>
+</tr>
+<tr>
+<td>草莓</td>
+<td>100</td>
+</tr>
+<tr>
+<td>香蕉</td>
+<td>100</td>
+</tr>
+</tbody></table>
+<figure class="highlight sql"><table><tr><td class="code"><pre><span class="line">搜尋價格相同，商品名稱卻不同SQL</span><br><span class="line"><span class="keyword">SELECT</span> <span class="keyword">DISTINCT</span> A1.name,A1.price</span><br><span class="line"><span class="keyword">FROM</span> Product A1 <span class="keyword">INNER</span> <span class="keyword">JOIN</span> Product A2 <span class="keyword">ON</span> A1.price = A2.price</span><br><span class="line"><span class="keyword">AND</span> A1.name &lt;&gt; A2.name</span><br><span class="line"><span class="keyword">ORDER</span> <span class="keyword">BY</span> P1.price;</span><br></pre></td></tr></table></figure>
+
+<p>結果:</p>
+<table>
+<thead>
+<tr>
+<th>name(商品名稱)</th>
+<th>price(價格)</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>蘋果</td>
+<td>50</td>
+</tr>
+<tr>
+<td>葡萄</td>
+<td>50</td>
+</tr>
+<tr>
+<td>草莓</td>
+<td>100</td>
+</tr>
+<tr>
+<td>橘子</td>
+<td>100</td>
+</tr>
+<tr>
+<td>香蕉</td>
+<td>100</td>
+</tr>
+</tbody></table>
+<h4 id="四、總結"><a href="#四、總結" class="headerlink" title="四、總結"></a>四、總結</h4><p>自我連結就是利用自身表去找出想要的資料。</p>
+<p>1.自我連結通常會與非等值連結搭配使用。</p>
+<p>2.與 GROUP BY 組合可建立遞迴性集合。</p>
+<p>3.想成是讓不同資料表連結。</p>
+<p>4.從邏輯層級思考，而不是物理層級。</p>
+<p>參考資料: </p>
+<p>1.SQL 達人的工作現場攻略筆</p>
+]]></content>
+      <categories>
+        <category>資料庫</category>
+      </categories>
+      <tags>
+        <tag>資料庫</tag>
+      </tags>
   </entry>
   <entry>
     <title>SQL 達人的工作現場攻略筆記 - CH-11 要讓SQL加速囉</title>
@@ -326,298 +622,11 @@
 <p>2.<a href="https://ithelp.ithome.com.tw/articles/10221971">https://ithelp.ithome.com.tw/articles/10221971</a></p>
 ]]></content>
       <categories>
-        <category>SQL</category>
+        <category>資料庫</category>
       </categories>
-  </entry>
-  <entry>
-    <title>SQL 達人的工作現場攻略筆記 - CH-3 自我連結使用方式</title>
-    <url>/2020/11/17/sql/202011172350/</url>
-    <content><![CDATA[<h4 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h4><p>SQL 提供連結會依照特徵命名，分別為<strong>內部連結</strong>、<strong>外部連結</strong>、<strong>交叉連結</strong>這些，且這些連結通常會以不同的資料表為對象，但 SQL 並未禁止同一張表用連結，此時在同一張資料表套用連結稱為<strong>自我連結 self join</strong>。</p>
-<h4 id="一、重複排序、排列、結合"><a href="#一、重複排序、排列、結合" class="headerlink" title="一、重複排序、排列、結合"></a>一、重複排序、排列、結合</h4><p>假設有張表商品與價錢資料表、其中共有蘋果、橘子、香蕉三筆記錄不得不製作業績表時候，必須取得商品組合。</p>
-<table>
-<thead>
-<tr>
-<th>name(產品名稱)</th>
-<th>price (價錢)</th>
-</tr>
-</thead>
-<tbody><tr>
-<td>蘋果</td>
-<td>100</td>
-</tr>
-<tr>
-<td>橘子</td>
-<td>50</td>
-</tr>
-<tr>
-<td>香蕉</td>
-<td>80</td>
-</tr>
-</tbody></table>
-<p>說是組合其實組合的種類有兩種，一種是重視的排列順序<strong>有序數對</strong>(ordered pair)，另一種是不重視順序的<strong>無序數對</strong>(unordered pair)。要建立有序數對非常簡單，例如:</p>
-<figure class="highlight sql"><table><tr><td class="code"><pre><span class="line">建立重複排序SQL</span><br><span class="line"><span class="keyword">SELECT</span> P1.name <span class="keyword">AS</span> name_1, P2.name <span class="keyword">AS</span> name_2　</span><br><span class="line"><span class="keyword">FROM</span> Products P1 <span class="keyword">CROSS</span> <span class="keyword">JOIN</span> Products P2;</span><br></pre></td></tr></table></figure>
-
-<p>結果:</p>
-<table>
-<thead>
-<tr>
-<th>name_1</th>
-<th>name_2</th>
-</tr>
-</thead>
-<tbody><tr>
-<td>蘋果</td>
-<td>蘋果</td>
-</tr>
-<tr>
-<td>蘋果</td>
-<td>橘子</td>
-</tr>
-<tr>
-<td>蘋果</td>
-<td>香蕉</td>
-</tr>
-<tr>
-<td>橘子</td>
-<td>蘋果</td>
-</tr>
-<tr>
-<td>橘子</td>
-<td>橘子</td>
-</tr>
-<tr>
-<td>橘子</td>
-<td>香蕉</td>
-</tr>
-<tr>
-<td>香蕉</td>
-<td>蘋果</td>
-</tr>
-<tr>
-<td>香蕉</td>
-<td>橘子</td>
-</tr>
-<tr>
-<td>香蕉</td>
-<td>香蕉</td>
-</tr>
-</tbody></table>
-<p>交叉連接為兩個資料表間的笛卡兒乘積 (Cartesian product)，兩個資料表在結合時，不指定任何條件，即將兩個資料表中所有的可能排列組合出來。可以看到這種連結方式出現很多多餘的組合，這都是因為重視順序的集合，此外也可以將交叉連結寫成以下方式‧</p>
-<figure class="highlight sql"><table><tr><td class="code"><pre><span class="line">交叉連結另一種寫法</span><br><span class="line"><span class="keyword">SELECT</span> P1.name <span class="keyword">AS</span> name_1, P2.name <span class="keyword">AS</span> name_2　</span><br><span class="line"><span class="keyword">FROM</span> Products P1, Products P2;</span><br></pre></td></tr></table></figure>
-
-<p>此時作者卻說這種語法不要使用，原因是因為希望執行設有連結條件的內部連結，卻有可能忘記撰寫連結條件而變成交叉連結，產生預料之外的結果，交叉連結會消耗少不資源。接著將程式碼改寫成排除多餘的集合內容。首先排除(蘋果，蘋果)這種元素組合。</p>
-<figure class="highlight sql"><table><tr><td class="code"><pre><span class="line">取得排列SQL</span><br><span class="line"><span class="keyword">SELECT</span> P1.name <span class="keyword">AS</span> name_1, P2.name <span class="keyword">AS</span> name_2　</span><br><span class="line"><span class="keyword">FROM</span> Products P1 <span class="keyword">INNER</span> <span class="keyword">JOIN</span> Products P2 <span class="keyword">ON</span> P1.name &lt;&gt; P2.name;</span><br></pre></td></tr></table></figure>
-
-<p>結果:</p>
-<table>
-<thead>
-<tr>
-<th>name_1</th>
-<th>name_2</th>
-</tr>
-</thead>
-<tbody><tr>
-<td>蘋果</td>
-<td>橘子</td>
-</tr>
-<tr>
-<td>蘋果</td>
-<td>香蕉</td>
-</tr>
-<tr>
-<td>橘子</td>
-<td>蘋果</td>
-</tr>
-<tr>
-<td>橘子</td>
-<td>香蕉</td>
-</tr>
-<tr>
-<td>香蕉</td>
-<td>蘋果</td>
-</tr>
-<tr>
-<td>香蕉</td>
-<td>橘子</td>
-</tr>
-</tbody></table>
-<blockquote>
-<p>ಠ_ಠ CROSS JOIN mysql 是舊版可能不支援此寫法，就會有使用 FROM table1,table2 方式。</p>
-</blockquote>
-<p>早期語法可能使用下列，但只要錯誤一步就有可能會寫成剛剛的交叉連結，所以盡可能不要使用此寫法。原因是因為忘記加上 WHERE 條件就會執行交叉連結，但若是使用 INNER JOIN 的語法就算忘記大部的 DBMS 都會視為語法錯誤。</p>
-<figure class="highlight sql"><table><tr><td class="code"><pre><span class="line">取得排列SQL</span><br><span class="line"><span class="keyword">SELECT</span> P1.name <span class="keyword">AS</span> name_1, P2.name <span class="keyword">AS</span> name_2　</span><br><span class="line"><span class="keyword">FROM</span> Products P1, Products P2</span><br><span class="line"><span class="keyword">WHERE</span> P1.name &lt;&gt; P2.name;</span><br></pre></td></tr></table></figure>
-
-<p>這裡說明如果上面忘記轉寫條件又會變成交叉連結，但使用 INNER JOIN 方式忘記寫條件系統就會噴錯，算是一種安全的寫法。接下來作者叫我們嘗試排除(蘋果、橘子)與(橘子、蘋果)這種只是調換順序組合。</p>
-<figure class="highlight sql"><table><tr><td class="code"><pre><span class="line">取得組合SQL</span><br><span class="line"><span class="keyword">SELECT</span> P1.name <span class="keyword">AS</span> name_1, P2.name <span class="keyword">AS</span> name_2</span><br><span class="line">  <span class="keyword">FROM</span> Products P1</span><br><span class="line">  <span class="keyword">INNER</span> <span class="keyword">JOIN</span> Products P2 <span class="keyword">ON</span> P1.name &gt; P2.name</span><br></pre></td></tr></table></figure>
-
-<p>結果:</p>
-<table>
-<thead>
-<tr>
-<th>name_1</th>
-<th>name_2</th>
-</tr>
-</thead>
-<tbody><tr>
-<td>蘋果</td>
-<td>橘子</td>
-</tr>
-<tr>
-<td>香蕉</td>
-<td>橘子</td>
-</tr>
-<tr>
-<td>香蕉</td>
-<td>蘋果</td>
-</tr>
-</tbody></table>
-<p>若想取得三種以上得組合，只需將程式碼改成以下內容。</p>
-<figure class="highlight sql"><table><tr><td class="code"><pre><span class="line">取得組合SQL 擴充三欄位版本</span><br><span class="line"><span class="keyword">SELECT</span> P1.name <span class="keyword">AS</span> name_1,</span><br><span class="line">       P2.name <span class="keyword">AS</span> name_2,　</span><br><span class="line">       P3.name <span class="keyword">AS</span> name_3,</span><br><span class="line">  <span class="keyword">FROM</span> Products P1</span><br><span class="line">  <span class="keyword">INNER</span> <span class="keyword">JOIN</span> Products P2 <span class="keyword">ON</span> P1.name &gt; P2.name</span><br><span class="line">  <span class="keyword">INNER</span> <span class="keyword">JOIN</span> Products P3 <span class="keyword">ON</span> P2.name &gt; P3.name;</span><br></pre></td></tr></table></figure>
-
-<p>結果:</p>
-<table>
-<thead>
-<tr>
-<th>name_1</th>
-<th>name_2</th>
-<th>name_3</th>
-</tr>
-</thead>
-<tbody><tr>
-<td>蘋果</td>
-<td>橘子</td>
-<td>香蕉</td>
-</tr>
-</tbody></table>
-<p>除了例題使用的=之外，使用&gt;、&lt;、&lt;&gt;這種比較運算子連結稱為<strong>非等值連結</strong>。這種連結與自我連結一起使用也稱為<strong>自我非等值連結</strong>。這種一般來說不太會在商業邏輯使用，但會建立在欄位組合使用。</p>
-<h4 id="二、刪除重複列"><a href="#二、刪除重複列" class="headerlink" title="二、刪除重複列"></a>二、刪除重複列</h4><p>在關聯式資料世界裡，重複列與 NULL 差不多是令人討厭，所以也有許多排列重複列的方法因此問世。用剛剛產品資料表例子，試著排除重複出現橘子，而這張表沒有設定Key。</p>
-<figure class="highlight sql"><table><tr><td class="code"><pre><span class="line">刪除重複列SQL</span><br><span class="line"><span class="keyword">DELETE</span> <span class="keyword">FROM</span> Products P1</span><br><span class="line"><span class="keyword">WHERE</span> <span class="keyword">rowid</span> &lt; (<span class="keyword">SELECT</span> <span class="keyword">MAX</span>(P2.rowid)</span><br><span class="line"><span class="keyword">FROM</span> Products P2 <span class="keyword">WHERE</span> P1.name = P2.name <span class="keyword">AND</span> P1.price = P2.price);</span><br></pre></td></tr></table></figure>
-
-<p>這裡使用方式是虛擬欄位去取得列的編號因為這張表沒有設定Key關係，而在mysql中是名稱是使用_rowid，<br>在SQL裡擁有不同名稱的集合被當成不同的集合，即使物理層級相同的存在，在邏輯層級仍屬於不同的存在。</p>
-<h4 id="三、部分不一致的-Key-搜尋"><a href="#三、部分不一致的-Key-搜尋" class="headerlink" title="三、部分不一致的 Key 搜尋"></a>三、部分不一致的 Key 搜尋</h4><table>
-<thead>
-<tr>
-<th>name(姓名)</th>
-<th>family_id(家庭 ID)</th>
-<th>address(地址)</th>
-</tr>
-</thead>
-<tbody><tr>
-<td>許郁文</td>
-<td>100</td>
-<td>台北市萬華區長泰街 3-2-29</td>
-</tr>
-<tr>
-<td>許美美</td>
-<td>100</td>
-<td>台北市萬華區長泰街 3-2-92</td>
-</tr>
-<tr>
-<td>張瑋礽</td>
-<td>200</td>
-<td>台北市中正區南海路 2-8-1</td>
-</tr>
-<tr>
-<td>張銘仁</td>
-<td>200</td>
-<td>台北市中正區南海路 2-8-1</td>
-</tr>
-<tr>
-<td>Holmes</td>
-<td>300</td>
-<td>貝克街 221B</td>
-</tr>
-<tr>
-<td>Watson</td>
-<td>400</td>
-<td>貝克街 221B</td>
-</tr>
-</tbody></table>
-<p>接下來將下列聯絡人資料表為例。主 Key 是人名，同一家族的人使用相同家族 ID，基本上同一家人會有相同的地址，但也有像是 Holmes 跟 Watson 這種還不是家人卻同居的情侶，書中是說將目光放在許家夫妻上，這兩個人並不是分居而是地址有誤，以這種情況如何篩選出是同一家人但地址卻不一致的紀錄呢?</p>
-<figure class="highlight sql"><table><tr><td class="code"><pre><span class="line">搜尋同一家人，地址不同的SQL</span><br><span class="line"><span class="keyword">SELECT</span> <span class="keyword">DISTINCT</span> A1.name,A1.address</span><br><span class="line"><span class="keyword">FROM</span> Address A1 <span class="keyword">INNER</span> <span class="keyword">JOIN</span> Address A2 <span class="keyword">ON</span> A1.family_id = A2.family_id</span><br><span class="line"><span class="keyword">AND</span> A1.address &lt;&gt; A2.address;</span><br></pre></td></tr></table></figure>
-
-<blockquote>
-<p>方法有很多種但如果是自我非等值連結撰寫，就能將程式碼寫得很簡潔。</p>
-</blockquote>
-<p>從下面商品資料表找出相同價格商品</p>
-<table>
-<thead>
-<tr>
-<th>name(商品名稱)</th>
-<th>price(價格)</th>
-</tr>
-</thead>
-<tbody><tr>
-<td>蘋果</td>
-<td>50</td>
-</tr>
-<tr>
-<td>橘子</td>
-<td>100</td>
-</tr>
-<tr>
-<td>葡萄</td>
-<td>50</td>
-</tr>
-<tr>
-<td>西瓜</td>
-<td>80</td>
-</tr>
-<tr>
-<td>檸檬</td>
-<td>30</td>
-</tr>
-<tr>
-<td>草莓</td>
-<td>100</td>
-</tr>
-<tr>
-<td>香蕉</td>
-<td>100</td>
-</tr>
-</tbody></table>
-<figure class="highlight sql"><table><tr><td class="code"><pre><span class="line">搜尋價格相同，商品名稱卻不同SQL</span><br><span class="line"><span class="keyword">SELECT</span> <span class="keyword">DISTINCT</span> A1.name,A1.price</span><br><span class="line"><span class="keyword">FROM</span> Product A1 <span class="keyword">INNER</span> <span class="keyword">JOIN</span> Product A2 <span class="keyword">ON</span> A1.price = A2.price</span><br><span class="line"><span class="keyword">AND</span> A1.name &lt;&gt; A2.name</span><br><span class="line"><span class="keyword">ORDER</span> <span class="keyword">BY</span> P1.price;</span><br></pre></td></tr></table></figure>
-
-<p>結果:</p>
-<table>
-<thead>
-<tr>
-<th>name(商品名稱)</th>
-<th>price(價格)</th>
-</tr>
-</thead>
-<tbody><tr>
-<td>蘋果</td>
-<td>50</td>
-</tr>
-<tr>
-<td>葡萄</td>
-<td>50</td>
-</tr>
-<tr>
-<td>草莓</td>
-<td>100</td>
-</tr>
-<tr>
-<td>橘子</td>
-<td>100</td>
-</tr>
-<tr>
-<td>香蕉</td>
-<td>100</td>
-</tr>
-</tbody></table>
-<h4 id="四、總結"><a href="#四、總結" class="headerlink" title="四、總結"></a>四、總結</h4><p>自我連結就是利用自身表去找出想要的資料。</p>
-<p>1.自我連結通常會與非等值連結搭配使用。</p>
-<p>2.與 GROUP BY 組合可建立遞迴性集合。</p>
-<p>3.想成是讓不同資料表連結。</p>
-<p>4.從邏輯層級思考，而不是物理層級。</p>
-<p>參考資料: </p>
-<p>1.SQL 達人的工作現場攻略筆</p>
-]]></content>
-      <categories>
-        <category>SQL</category>
-      </categories>
+      <tags>
+        <tag>資料庫</tag>
+      </tags>
   </entry>
   <entry>
     <title>SQL 達人的工作現場攻略筆記 - CH-18 GROUP BY 與 PARTITION BY</title>
@@ -797,12 +806,15 @@
 <p>1.SQL 達人的工作現場攻略筆</p>
 ]]></content>
       <categories>
-        <category>SQL</category>
+        <category>資料庫</category>
       </categories>
+      <tags>
+        <tag>資料庫</tag>
+      </tags>
   </entry>
   <entry>
     <title>單元測試的藝術 第二版 - 01 單元測試藝術</title>
-    <url>/2021/03/06/unitTest/202103061655/</url>
+    <url>/2021/03/06/unit-test/202103061655/</url>
     <content><![CDATA[<h2 id="單元測試基礎"><a href="#單元測試基礎" class="headerlink" title="單元測試基礎"></a>單元測試基礎</h2><h4 id="1-1-逐步定義單元測試"><a href="#1-1-逐步定義單元測試" class="headerlink" title="1.1 逐步定義單元測試"></a>1.1 逐步定義單元測試</h4><p>在軟體開發領域上，單元測試並非一個概念，從1970年代使用過的測試設計程式時，單元測試就已經出現了，而Kent Beck在Smalltalk中加入單元測試概念，這個概念也帶入到許多程式語言上。<br>而單元測試的定義上需要定義的更好一些。</p>
 <pre><code>定義1.0 一個單元測試就是一段程式碼，這段程式碼呼叫另一個程式碼，
 然後驗證某些假設性問題正確性。如果驗證錯誤，則單元測試就會失敗，
@@ -867,14 +879,20 @@
       <categories>
         <category>單元測試</category>
       </categories>
+      <tags>
+        <tag>單元測試</tag>
+      </tags>
   </entry>
   <entry>
     <title>菜鳥工程師👨‍💻</title>
-    <url>/2020/11/10/unitTest/202011121830/</url>
+    <url>/2020/11/10/feeling/202011121830/</url>
     <content><![CDATA[<h1 id="菜鳥工程師👨‍💻"><a href="#菜鳥工程師👨‍💻" class="headerlink" title="菜鳥工程師👨‍💻"></a>菜鳥工程師👨‍💻</h1><h5 id="第一篇日記"><a href="#第一篇日記" class="headerlink" title="第一篇日記"></a>第一篇日記</h5><p>&nbsp;&nbsp;大學畢業後馬上擔任網頁後端工程師，在職中也有繼續就讀碩士班，不斷充實自己，雖說年資不久但也經歷過許多大小事情，希望藉此透過部落格來撰寫工程師歷程心得:D。</p>
 ]]></content>
       <categories>
-        <category>部落格</category>
+        <category>心情日誌</category>
       </categories>
+      <tags>
+        <tag>心情日誌</tag>
+      </tags>
   </entry>
 </search>
