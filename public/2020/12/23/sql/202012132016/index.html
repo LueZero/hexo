@@ -28,7 +28,7 @@
 <meta property="og:description" content="前言 SQL 的效能一直是 DB 工程師必須面對的主要課程之一，甚至有些人認為是唯一的課題。此文章是改善 SQL 的效能，讓執行速度更快減少更多資源。  使用效率的搜尋 若子查詢為參數 使用 EXISTS 代替 IN，在 IN 述詞很方便，也很好讀，但卻會遇到效能瓶頸的問題，若當 IN 參數 (1,2,3) 這種 List 時繼就不需要改寫，但如果以子查詢為參數就必須要注意，通常 NOT IN 跟">
 <meta property="og:locale" content="zh_TW">
 <meta property="article:published_time" content="2020-12-23T12:16:00.000Z">
-<meta property="article:modified_time" content="2023-02-08T06:16:16.326Z">
+<meta property="article:modified_time" content="2023-02-08T09:17:55.997Z">
 <meta property="article:author" content="LueZero">
 <meta property="article:tag" content="資料庫">
 <meta name="twitter:card" content="summary">
@@ -225,7 +225,7 @@
                   <i class="far fa-calendar-check"></i>
                 </span>
                 <span class="post-meta-item-text">更新於</span>
-                <time title="修改時間：2023-02-08 14:16:16" itemprop="dateModified" datetime="2023-02-08T14:16:16+08:00">2023-02-08</time>
+                <time title="修改時間：2023-02-08 17:17:55" itemprop="dateModified" datetime="2023-02-08T17:17:55+08:00">2023-02-08</time>
               </span>
             <span class="post-meta-item">
               <span class="post-meta-item-icon">
@@ -314,10 +314,10 @@
 <td>瑋</td>
 </tr>
 </tbody></table>
-<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">-- 為什麼 EXISTS 會比較快？大致上有兩個理由。</span></span><br><span class="line">1. 如果連結key帶有索引值，就可能直接按照索引值，不需觀察 Class_B 的資料表。</span><br><span class="line">2. EXISTS 只要找到一筆符合的列，就會立刻停止搜尋，不會是 IN 得全面搜尋一遍。</span><br></pre></td></tr></table></figure>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">-- 為什麼 EXISTS 會比較快?大致上有兩個理由。</span></span><br><span class="line">1. 如果連結key帶有索引值，就可能直接按照索引值，不需觀察 Class_B 的資料表。</span><br><span class="line">2. EXISTS 只要找到一筆符合的列，就會立刻停止搜尋，不會是 IN 得全面搜尋一遍。</span><br></pre></td></tr></table></figure>
 
 <h4 id="子查詢為參數時，使用連結代替-IN"><a href="#子查詢為參數時，使用連結代替-IN" class="headerlink" title="子查詢為參數時，使用連結代替 IN"></a>子查詢為參數時，使用連結代替 IN</h4><p>要改善 IN 的效能，除了使用 EXISTS 改寫，也可以利用連結方式去實現。</p>
-<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">SELECT</span> Ａ.id,A.name <span class="keyword">FROM</span> Class_A A <span class="keyword">INNER</span> <span class="keyword">JOIN</span> Class_B B <span class="keyword">ON</span> A.id = B.id;</span><br></pre></td></tr></table></figure>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">SELECT</span> A.id,A.name <span class="keyword">FROM</span> Class_A A <span class="keyword">INNER</span> <span class="keyword">JOIN</span> Class_B B <span class="keyword">ON</span> A.id = B.id;</span><br></pre></td></tr></table></figure>
 
 <h2 id="避開排序"><a href="#避開排序" class="headerlink" title="避開排序"></a>避開排序</h2><p>SQL 與程式語言不同，使用者無法直接命令 DBMS 指定排序運算，不過這不代表 DBMS 不執行排序，更精準的說是 DBMS 非常頻繁的偷偷執行排序，也導致使用者不用去理會哪中運算正在執行排序。</p>
 <p>會執行排序如下:</p>
@@ -429,7 +429,7 @@
 <td>7</td>
 </tr>
 </tbody></table>
-<p>根據上方商品主資料表選出業績表的商品，簡單說就是找出有業績的商品，此時書中說使用IN雖然不錯。但前面提到用連結會更好。</p>
+<p>根據上方商品主資料表選出業績表的商品，簡單說就是找出有業績的商品，此時書中說使用 IN 雖然不錯。但前面提到用連結會更好。</p>
 <figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">SELECT</span> I.item_no <span class="keyword">FROM</span> Items I <span class="keyword">INNER</span> <span class="keyword">JOIN</span> SalesHistory SH <span class="keyword">ON</span> I.item_no = SH.item_no;</span><br></pre></td></tr></table></figure>
 
 <p>結果:</p>
@@ -513,7 +513,7 @@
 <ul>
 <li>使用索引值時候，欄位最好是乾淨的。</li>
 </ul>
-<h4 id="索引值欄位有NULL"><a href="#索引值欄位有NULL" class="headerlink" title="索引值欄位有NULL"></a>索引值欄位有NULL</h4><p>索引值有 NULL 是很難處理的，而且不同規格有不同處理的方式，這也是因為受到使用者使用 IS NULL 或是 IS NOT NULL，就無法使用索引值，或是NULL偏多的欄位無法使用索引的限制導致。此外該如何與 IS NOT NULL 同等條件使用索引值，可以使用下列方式</p>
+<h4 id="索引值欄位有NULL"><a href="#索引值欄位有NULL" class="headerlink" title="索引值欄位有NULL"></a>索引值欄位有NULL</h4><p>索引值有 NULL 是很難處理的，而且不同規格有不同處理的方式，這也是因為受到使用者使用 IS NULL 或是 IS NOT NULL，就無法使用索引值，或是 NULL 偏多的欄位無法使用索引的限制導致。此外該如何與 IS NOT NULL 同等條件使用索引值，可以使用下列方式</p>
 <figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">-- IS NOT NULL 替代方案</span></span><br><span class="line"><span class="keyword">SELECT</span> * <span class="keyword">FROM</span> SomeTable <span class="keyword">WHERE</span> col_1 &gt; <span class="number">0</span>;</span><br></pre></td></tr></table></figure>
 
 <h4 id="使用否定型的情況"><a href="#使用否定型的情況" class="headerlink" title="使用否定型的情況"></a>使用否定型的情況</h4><p>列出否定型不會使用索引值</p>

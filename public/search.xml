@@ -1,193 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <search>
   <entry>
-    <title>SQL 達人的工作現場攻略筆記 - CH-18 GROUP BY 與 PARTITION BY</title>
-    <url>/2021/01/17/sql/202101172100/</url>
-    <content><![CDATA[<h4 id="大家了解兩者的差異嗎"><a href="#大家了解兩者的差異嗎" class="headerlink" title="大家了解兩者的差異嗎?"></a>大家了解兩者的差異嗎?</h4><ul>
-<li><p>group by: 對檢索結果的保留行進行單純分組，返回聚合之後的組的數據統計值的記錄。劃分為多組，每組返回一行。</p>
-</li>
-<li><p>partition by: 返回分組裡的每一條數據，在應用關聯的視窗函數前確定行集的分區和排序，然後，視窗函數將計算每一行的值。</p>
-</li>
-</ul>
-<p>SQL 篩選各種資料時，最基本操作就是某種準備替資料分組。其實除了使用 SQL 之外，日常生活中整理資料、查詢資料時，替資料建群組。</p>
-<p>而在 SQL 中具有建立群組功能就是 GROUP BY 跟 PARTITION BY。這兩種方式都能利用資料表指定的 KEY 來分割資料，而兩者不同地方在於GROUP BY會再分割後，將資料彙整為一列，而 PARTITION BY 是將每一欄位取出整理。</p>
-<p>透過下列團隊成員資料表說明兩者差異。</p>
-<p>Teams</p>
-<table>
-<thead>
-<tr>
-<th>member</th>
-<th>team</th>
-<th>age</th>
-</tr>
-</thead>
-<tbody><tr>
-<td>郁文</td>
-<td>A</td>
-<td>28</td>
-</tr>
-<tr>
-<td>瑋乃</td>
-<td>A</td>
-<td>19</td>
-</tr>
-<tr>
-<td>銘仁</td>
-<td>A</td>
-<td>23</td>
-</tr>
-<tr>
-<td>靚儀</td>
-<td>B</td>
-<td>40</td>
-</tr>
-<tr>
-<td>勝朋</td>
-<td>B</td>
-<td>29</td>
-</tr>
-<tr>
-<td>美美</td>
-<td>C</td>
-<td>30</td>
-</tr>
-<tr>
-<td>建國</td>
-<td>D</td>
-<td>28</td>
-</tr>
-<tr>
-<td>崇恩</td>
-<td>D</td>
-<td>28</td>
-</tr>
-<tr>
-<td>連雅</td>
-<td>D</td>
-<td>24</td>
-</tr>
-<tr>
-<td>光城</td>
-<td>D</td>
-<td>22</td>
-</tr>
-</tbody></table>
-<p>若以 GROUP BY 與 PARTITION BY 處理這張資料表，可寫出取得團隊資訊的查詢。不管使用哪個陳述句，Teams 資料表都會先分割部分集合，再以SUM函數彙整或 RANK 排出順位。</p>
-<figure class="highlight sql"><table><tr><td class="code"><pre><span class="line"><span class="keyword">SELECT</span> <span class="keyword">member</span>,team,age,</span><br><span class="line"><span class="keyword">RANK</span>() <span class="keyword">OVER</span>(<span class="keyword">PARTITION</span> <span class="keyword">BY</span> team <span class="keyword">ORDER</span> <span class="keyword">BY</span> age <span class="keyword">DESC</span>) rn,</span><br><span class="line"><span class="keyword">DENSE_RANK</span>()  <span class="keyword">OVER</span>(<span class="keyword">PARTITION</span> <span class="keyword">BY</span> team <span class="keyword">ORDER</span> <span class="keyword">BY</span> age <span class="keyword">DESC</span>) dense_rn,</span><br><span class="line">ROW_NUMBER()  <span class="keyword">OVER</span>(<span class="keyword">PARTITION</span> <span class="keyword">BY</span> team <span class="keyword">ORDER</span> <span class="keyword">BY</span> age <span class="keyword">DESC</span>) row_num</span><br><span class="line"><span class="keyword">FROM</span> Teams</span><br><span class="line"><span class="keyword">ORDER</span> <span class="keyword">BY</span> team, rn</span><br></pre></td></tr></table></figure>
-
-<p>結果:</p>
-<table>
-<thead>
-<tr>
-<th>member</th>
-<th>team</th>
-<th>age</th>
-<th>rn</th>
-<th>dense_rn</th>
-<th>row_num</th>
-</tr>
-</thead>
-<tbody><tr>
-<td>郁文</td>
-<td>A</td>
-<td>28</td>
-<td>1</td>
-<td>1</td>
-<td>1</td>
-</tr>
-<tr>
-<td>銘仁</td>
-<td>A</td>
-<td>23</td>
-<td>2</td>
-<td>2</td>
-<td>2</td>
-</tr>
-<tr>
-<td>瑋乃</td>
-<td>A</td>
-<td>19</td>
-<td>3</td>
-<td>3</td>
-<td>3</td>
-</tr>
-<tr>
-<td>靚儀</td>
-<td>B</td>
-<td>40</td>
-<td>1</td>
-<td>1</td>
-<td>1</td>
-</tr>
-<tr>
-<td>勝朋</td>
-<td>B</td>
-<td>29</td>
-<td>2</td>
-<td>2</td>
-<td>2</td>
-</tr>
-<tr>
-<td>美美</td>
-<td>C</td>
-<td>30</td>
-<td>1</td>
-<td>1</td>
-<td>1</td>
-</tr>
-<tr>
-<td>建國</td>
-<td>D</td>
-<td>28</td>
-<td>1</td>
-<td>1</td>
-<td>1</td>
-</tr>
-<tr>
-<td>崇恩</td>
-<td>D</td>
-<td>28</td>
-<td>1</td>
-<td>1</td>
-<td>2</td>
-</tr>
-<tr>
-<td>連雅</td>
-<td>D</td>
-<td>24</td>
-<td>3</td>
-<td>2</td>
-<td>3</td>
-</tr>
-<tr>
-<td>光城</td>
-<td>D</td>
-<td>22</td>
-<td>4</td>
-<td>3</td>
-<td>4</td>
-</tr>
-</tbody></table>
-<p>根據書中 286 頁圖片，使用圖形代表集合，是為了呈現分割，經過仔細觀察後發現</p>
-<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">每一個都不是空集合</span><br><span class="line">部分集合總和等於分割前的集合</span><br><span class="line">隨機從中挑選兩個集合出來，不會有共通得部分。</span><br></pre></td></tr></table></figure>
-<p>由於部分集合本來就是從資料表分割而來，所以不會有空集合，且部分集合的總和當然會是分割之的母體集合，所以不會有成員因為分割而失蹤。此外也不會有同時屬於兩個部分集合的成員。每一位成員必然隸屬一個集合。也就是說 GROUP BY 與 PARTITION BY 可將各成員分割至團隊得函數。</p>
-<h4 id="結論"><a href="#結論" class="headerlink" title="結論"></a>結論</h4><p>SQL 與 RDB 採用許多集合論以及群的成果，或許內容有點抽象，但也因為抽象內容，所以才廣泛應用。</p>
-<p>參考資料: </p>
-<ol>
-<li>SQL 達人的工作現場攻略筆記</li>
-</ol>
-]]></content>
-      <categories>
-        <category>資料庫</category>
-      </categories>
-      <tags>
-        <tag>資料庫</tag>
-      </tags>
-  </entry>
-  <entry>
     <title>SQL 達人的工作現場攻略筆記 - CH-3 自我連結使用方式</title>
     <url>/2020/11/17/sql/202011172350/</url>
-    <content><![CDATA[<h4 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h4><p>SQL 提供連結會依照特徵命名，分別為 <strong>內部連結</strong>、<strong>外部連結</strong>、<strong>交叉連結</strong> 這些，且這些連結通常會以不同的資料表為對象，但 SQL 並未禁止同一張表用連結，此時在同一張資料表套用連結稱為 <strong>自我連結 self join</strong>。</p>
+    <content><![CDATA[<h4 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h4><p>SQL 提供連結會依照特徵命名，分別為<strong>內部連結</strong>、<strong>外部連結</strong>、<strong>交叉連結</strong>這些，且這些連結通常會以不同的資料表為對象，但 SQL 並未禁止同一張表用連結，此時在同一張資料表套用連結稱為<strong>自我連結 self join</strong>。</p>
 <h4 id="一、重複排序、排列、結合"><a href="#一、重複排序、排列、結合" class="headerlink" title="一、重複排序、排列、結合"></a>一、重複排序、排列、結合</h4><p>假設有張表商品與價錢資料表、其中共有蘋果、橘子、香蕉三筆記錄不得不製作業績表時候，必須取得商品組合。</p>
 <table>
 <thead>
@@ -209,7 +25,7 @@
 <td>80</td>
 </tr>
 </tbody></table>
-<p>說是組合其實組合的種類有兩種，一種是重視的排列順序 <strong>有序數對</strong> (ordered pair)，另一種是不重視順序的 <strong>無序數對</strong>(unordered pair)。要建立有序數對非常簡單，例如:</p>
+<p>說是組合其實組合的種類有兩種，一種是重視的排列順序<strong>有序數對</strong> (ordered pair)，另一種是不重視順序的<strong>無序數對</strong>(unordered pair)。要建立有序數對非常簡單，例如:</p>
 <figure class="highlight sql"><table><tr><td class="code"><pre><span class="line"><span class="comment">-- 建立重複排序SQL</span></span><br><span class="line"><span class="keyword">SELECT</span> P1.name <span class="keyword">AS</span> name_1, P2.name <span class="keyword">AS</span> name_2　</span><br><span class="line"><span class="keyword">FROM</span> Products P1 <span class="keyword">CROSS</span> <span class="keyword">JOIN</span> Products P2;</span><br></pre></td></tr></table></figure>
 
 <p>結果:</p>
@@ -344,11 +160,11 @@
 <td>香蕉</td>
 </tr>
 </tbody></table>
-<p>除了例題使用的 = 之外，使用 &gt;、&lt;、&lt;&gt; 這種比較運算子連結稱為 <strong>非等值連結</strong>。這種連結與自我連結一起使用也稱為 <strong>自我非等值連結</strong> 。這種一般來說不太會在商業邏輯使用，但會建立在欄位組合使用。</p>
+<p>除了例題使用的 = 之外，使用 &gt;、&lt;、&lt;&gt; 這種比較運算子連結稱為<strong>非等值連結</strong>。這種連結與自我連結一起使用也稱為<strong>自我非等值連結</strong>。這種一般來說不太會在商業邏輯使用，但會建立在欄位組合使用。</p>
 <h4 id="二、刪除重複列"><a href="#二、刪除重複列" class="headerlink" title="二、刪除重複列"></a>二、刪除重複列</h4><p>在關聯式資料世界裡，重複列與 NULL 差不多是令人討厭，所以也有許多排列重複列的方法因此問世。用剛剛產品資料表例子，試著排除重複出現橘子，而這張表沒有設定Key。</p>
 <figure class="highlight sql"><table><tr><td class="code"><pre><span class="line"><span class="comment">-- 刪除重複列SQL</span></span><br><span class="line"><span class="keyword">DELETE</span> <span class="keyword">FROM</span> Products P1</span><br><span class="line"><span class="keyword">WHERE</span> <span class="keyword">rowid</span> &lt; (<span class="keyword">SELECT</span> <span class="keyword">MAX</span>(P2.rowid)</span><br><span class="line"><span class="keyword">FROM</span> Products P2 <span class="keyword">WHERE</span> P1.name = P2.name <span class="keyword">AND</span> P1.price = P2.price);</span><br></pre></td></tr></table></figure>
 
-<p>這裡使用方式是虛擬欄位去取得列的編號因為這張表沒有設定 Key 關係，而在 MYSQL 中是名稱是使用 _rowid，<br>在 SQL 裡擁有不同名稱的集合被當成不同的集合，即使物理層級相同的存在，在邏輯層級仍屬於不同的存在。</p>
+<p>這裡使用方式是虛擬欄位去取得列的編號因為這張表沒有設定 Key 關係，而在 MYSQL 中是名稱是使用<code>_rowid</code>，<br>在 SQL 裡擁有不同名稱的集合被當成不同的集合，即使物理層級相同的存在，在邏輯層級仍屬於不同的存在。</p>
 <h4 id="三、部分不一致的-Key-搜尋"><a href="#三、部分不一致的-Key-搜尋" class="headerlink" title="三、部分不一致的 Key 搜尋"></a>三、部分不一致的 Key 搜尋</h4><table>
 <thead>
 <tr>
@@ -554,10 +370,10 @@
 <td>瑋</td>
 </tr>
 </tbody></table>
-<figure class="highlight sql"><table><tr><td class="code"><pre><span class="line"><span class="comment">-- 為什麼 EXISTS 會比較快？大致上有兩個理由。</span></span><br><span class="line">1. 如果連結key帶有索引值，就可能直接按照索引值，不需觀察 Class_B 的資料表。</span><br><span class="line">2. EXISTS 只要找到一筆符合的列，就會立刻停止搜尋，不會是 IN 得全面搜尋一遍。</span><br></pre></td></tr></table></figure>
+<figure class="highlight sql"><table><tr><td class="code"><pre><span class="line"><span class="comment">-- 為什麼 EXISTS 會比較快?大致上有兩個理由。</span></span><br><span class="line">1. 如果連結key帶有索引值，就可能直接按照索引值，不需觀察 Class_B 的資料表。</span><br><span class="line">2. EXISTS 只要找到一筆符合的列，就會立刻停止搜尋，不會是 IN 得全面搜尋一遍。</span><br></pre></td></tr></table></figure>
 
 <h4 id="子查詢為參數時，使用連結代替-IN"><a href="#子查詢為參數時，使用連結代替-IN" class="headerlink" title="子查詢為參數時，使用連結代替 IN"></a>子查詢為參數時，使用連結代替 IN</h4><p>要改善 IN 的效能，除了使用 EXISTS 改寫，也可以利用連結方式去實現。</p>
-<figure class="highlight sql"><table><tr><td class="code"><pre><span class="line"><span class="keyword">SELECT</span> Ａ.id,A.name <span class="keyword">FROM</span> Class_A A <span class="keyword">INNER</span> <span class="keyword">JOIN</span> Class_B B <span class="keyword">ON</span> A.id = B.id;</span><br></pre></td></tr></table></figure>
+<figure class="highlight sql"><table><tr><td class="code"><pre><span class="line"><span class="keyword">SELECT</span> A.id,A.name <span class="keyword">FROM</span> Class_A A <span class="keyword">INNER</span> <span class="keyword">JOIN</span> Class_B B <span class="keyword">ON</span> A.id = B.id;</span><br></pre></td></tr></table></figure>
 
 <h2 id="避開排序"><a href="#避開排序" class="headerlink" title="避開排序"></a>避開排序</h2><p>SQL 與程式語言不同，使用者無法直接命令 DBMS 指定排序運算，不過這不代表 DBMS 不執行排序，更精準的說是 DBMS 非常頻繁的偷偷執行排序，也導致使用者不用去理會哪中運算正在執行排序。</p>
 <p>會執行排序如下:</p>
@@ -669,7 +485,7 @@
 <td>7</td>
 </tr>
 </tbody></table>
-<p>根據上方商品主資料表選出業績表的商品，簡單說就是找出有業績的商品，此時書中說使用IN雖然不錯。但前面提到用連結會更好。</p>
+<p>根據上方商品主資料表選出業績表的商品，簡單說就是找出有業績的商品，此時書中說使用 IN 雖然不錯。但前面提到用連結會更好。</p>
 <figure class="highlight sql"><table><tr><td class="code"><pre><span class="line"><span class="keyword">SELECT</span> I.item_no <span class="keyword">FROM</span> Items I <span class="keyword">INNER</span> <span class="keyword">JOIN</span> SalesHistory SH <span class="keyword">ON</span> I.item_no = SH.item_no;</span><br></pre></td></tr></table></figure>
 
 <p>結果:</p>
@@ -753,7 +569,7 @@
 <ul>
 <li>使用索引值時候，欄位最好是乾淨的。</li>
 </ul>
-<h4 id="索引值欄位有NULL"><a href="#索引值欄位有NULL" class="headerlink" title="索引值欄位有NULL"></a>索引值欄位有NULL</h4><p>索引值有 NULL 是很難處理的，而且不同規格有不同處理的方式，這也是因為受到使用者使用 IS NULL 或是 IS NOT NULL，就無法使用索引值，或是NULL偏多的欄位無法使用索引的限制導致。此外該如何與 IS NOT NULL 同等條件使用索引值，可以使用下列方式</p>
+<h4 id="索引值欄位有NULL"><a href="#索引值欄位有NULL" class="headerlink" title="索引值欄位有NULL"></a>索引值欄位有NULL</h4><p>索引值有 NULL 是很難處理的，而且不同規格有不同處理的方式，這也是因為受到使用者使用 IS NULL 或是 IS NOT NULL，就無法使用索引值，或是 NULL 偏多的欄位無法使用索引的限制導致。此外該如何與 IS NOT NULL 同等條件使用索引值，可以使用下列方式</p>
 <figure class="highlight sql"><table><tr><td class="code"><pre><span class="line"><span class="comment">-- IS NOT NULL 替代方案</span></span><br><span class="line"><span class="keyword">SELECT</span> * <span class="keyword">FROM</span> SomeTable <span class="keyword">WHERE</span> col_1 &gt; <span class="number">0</span>;</span><br></pre></td></tr></table></figure>
 
 <h4 id="使用否定型的情況"><a href="#使用否定型的情況" class="headerlink" title="使用否定型的情況"></a>使用否定型的情況</h4><p>列出否定型不會使用索引值</p>
@@ -805,6 +621,190 @@
 </li>
 <li><p><a href="https://ithelp.ithome.com.tw/articles/10221971">https://ithelp.ithome.com.tw/articles/10221971</a></p>
 </li>
+</ol>
+]]></content>
+      <categories>
+        <category>資料庫</category>
+      </categories>
+      <tags>
+        <tag>資料庫</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>SQL 達人的工作現場攻略筆記 - CH-18 GROUP BY 與 PARTITION BY</title>
+    <url>/2021/01/17/sql/202101172100/</url>
+    <content><![CDATA[<h4 id="大家了解兩者的差異嗎"><a href="#大家了解兩者的差異嗎" class="headerlink" title="大家了解兩者的差異嗎?"></a>大家了解兩者的差異嗎?</h4><ul>
+<li><p>group by: 對檢索結果的保留行進行單純分組，返回聚合之後的組的數據統計值的記錄。劃分為多組，每組返回一行。</p>
+</li>
+<li><p>partition by: 返回分組裡的每一條數據，在應用關聯的視窗函數前確定行集的分區和排序，然後，視窗函數將計算每一行的值。</p>
+</li>
+</ul>
+<p>SQL 篩選各種資料時，最基本操作就是某種準備替資料分組。其實除了使用 SQL 之外，日常生活中整理資料、查詢資料時，替資料建群組。</p>
+<p>而在 SQL 中具有建立群組功能就是 GROUP BY 跟 PARTITION BY。這兩種方式都能利用資料表指定的 KEY 來分割資料，而兩者不同地方在於 GROUP BY 會再分割後，將資料彙整為一列，而 PARTITION BY 是將每一欄位取出整理。</p>
+<p>透過下列團隊成員資料表說明兩者差異。</p>
+<p>Teams</p>
+<table>
+<thead>
+<tr>
+<th>member</th>
+<th>team</th>
+<th>age</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>郁文</td>
+<td>A</td>
+<td>28</td>
+</tr>
+<tr>
+<td>瑋乃</td>
+<td>A</td>
+<td>19</td>
+</tr>
+<tr>
+<td>銘仁</td>
+<td>A</td>
+<td>23</td>
+</tr>
+<tr>
+<td>靚儀</td>
+<td>B</td>
+<td>40</td>
+</tr>
+<tr>
+<td>勝朋</td>
+<td>B</td>
+<td>29</td>
+</tr>
+<tr>
+<td>美美</td>
+<td>C</td>
+<td>30</td>
+</tr>
+<tr>
+<td>建國</td>
+<td>D</td>
+<td>28</td>
+</tr>
+<tr>
+<td>崇恩</td>
+<td>D</td>
+<td>28</td>
+</tr>
+<tr>
+<td>連雅</td>
+<td>D</td>
+<td>24</td>
+</tr>
+<tr>
+<td>光城</td>
+<td>D</td>
+<td>22</td>
+</tr>
+</tbody></table>
+<p>若以 GROUP BY 與 PARTITION BY 處理這張資料表，可寫出取得團隊資訊的查詢。不管使用哪個陳述句，Teams 資料表都會先分割部分集合，再以SUM函數彙整或 RANK 排出順位。</p>
+<figure class="highlight sql"><table><tr><td class="code"><pre><span class="line"><span class="keyword">SELECT</span> <span class="keyword">member</span>,team,age,</span><br><span class="line"><span class="keyword">RANK</span>() <span class="keyword">OVER</span>(<span class="keyword">PARTITION</span> <span class="keyword">BY</span> team <span class="keyword">ORDER</span> <span class="keyword">BY</span> age <span class="keyword">DESC</span>) rn,</span><br><span class="line"><span class="keyword">DENSE_RANK</span>()  <span class="keyword">OVER</span>(<span class="keyword">PARTITION</span> <span class="keyword">BY</span> team <span class="keyword">ORDER</span> <span class="keyword">BY</span> age <span class="keyword">DESC</span>) dense_rn,</span><br><span class="line">ROW_NUMBER()  <span class="keyword">OVER</span>(<span class="keyword">PARTITION</span> <span class="keyword">BY</span> team <span class="keyword">ORDER</span> <span class="keyword">BY</span> age <span class="keyword">DESC</span>) row_num</span><br><span class="line"><span class="keyword">FROM</span> Teams</span><br><span class="line"><span class="keyword">ORDER</span> <span class="keyword">BY</span> team, rn</span><br></pre></td></tr></table></figure>
+
+<p>結果:</p>
+<table>
+<thead>
+<tr>
+<th>member</th>
+<th>team</th>
+<th>age</th>
+<th>rn</th>
+<th>dense_rn</th>
+<th>row_num</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>郁文</td>
+<td>A</td>
+<td>28</td>
+<td>1</td>
+<td>1</td>
+<td>1</td>
+</tr>
+<tr>
+<td>銘仁</td>
+<td>A</td>
+<td>23</td>
+<td>2</td>
+<td>2</td>
+<td>2</td>
+</tr>
+<tr>
+<td>瑋乃</td>
+<td>A</td>
+<td>19</td>
+<td>3</td>
+<td>3</td>
+<td>3</td>
+</tr>
+<tr>
+<td>靚儀</td>
+<td>B</td>
+<td>40</td>
+<td>1</td>
+<td>1</td>
+<td>1</td>
+</tr>
+<tr>
+<td>勝朋</td>
+<td>B</td>
+<td>29</td>
+<td>2</td>
+<td>2</td>
+<td>2</td>
+</tr>
+<tr>
+<td>美美</td>
+<td>C</td>
+<td>30</td>
+<td>1</td>
+<td>1</td>
+<td>1</td>
+</tr>
+<tr>
+<td>建國</td>
+<td>D</td>
+<td>28</td>
+<td>1</td>
+<td>1</td>
+<td>1</td>
+</tr>
+<tr>
+<td>崇恩</td>
+<td>D</td>
+<td>28</td>
+<td>1</td>
+<td>1</td>
+<td>2</td>
+</tr>
+<tr>
+<td>連雅</td>
+<td>D</td>
+<td>24</td>
+<td>3</td>
+<td>2</td>
+<td>3</td>
+</tr>
+<tr>
+<td>光城</td>
+<td>D</td>
+<td>22</td>
+<td>4</td>
+<td>3</td>
+<td>4</td>
+</tr>
+</tbody></table>
+<p>根據書中 286頁圖片，使用圖形代表集合，是為了呈現分割，經過仔細觀察後發現</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">每一個都不是空集合</span><br><span class="line">部分集合總和等於分割前的集合</span><br><span class="line">隨機從中挑選兩個集合出來，不會有共通得部分。</span><br></pre></td></tr></table></figure>
+<p>由於部分集合本來就是從資料表分割而來，所以不會有空集合，且部分集合的總和當然會是分割之的母體集合，所以不會有成員因為分割而失蹤。此外也不會有同時屬於兩個部分集合的成員。每一位成員必然隸屬一個集合。也就是說 GROUP BY 與 PARTITION BY 可將各成員分割至團隊得函數。</p>
+<h4 id="結論"><a href="#結論" class="headerlink" title="結論"></a>結論</h4><p>SQL 與 RDB 採用許多集合論以及群的成果，或許內容有點抽象，但也因為抽象內容，所以才廣泛應用。</p>
+<p>參考資料: </p>
+<ol>
+<li>SQL 達人的工作現場攻略筆記</li>
 </ol>
 ]]></content>
       <categories>

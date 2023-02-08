@@ -28,7 +28,7 @@
 <meta property="og:description" content="大家了解兩者的差異嗎?  * group by: 對檢索結果的保留行進行單純分組，返回聚合之後的組的數據統計值的記錄。劃分為多組，每組返回一行。          * partition by: 返回分組裡的每一條數據，在應用關聯的視窗函數前確定行集的分區和排序，然後，視窗函數將計算每一行的值。          SQL 篩選各種資料時，最基本操作就是某種準備替資料分組。其實除了使用 SQL 之外">
 <meta property="og:locale" content="zh_TW">
 <meta property="article:published_time" content="2021-01-17T13:00:00.000Z">
-<meta property="article:modified_time" content="2023-02-08T06:15:50.429Z">
+<meta property="article:modified_time" content="2023-02-08T09:18:54.531Z">
 <meta property="article:author" content="LueZero">
 <meta property="article:tag" content="資料庫">
 <meta name="twitter:card" content="summary">
@@ -225,7 +225,7 @@
                   <i class="far fa-calendar-check"></i>
                 </span>
                 <span class="post-meta-item-text">更新於</span>
-                <time title="修改時間：2023-02-08 14:15:50" itemprop="dateModified" datetime="2023-02-08T14:15:50+08:00">2023-02-08</time>
+                <time title="修改時間：2023-02-08 17:18:54" itemprop="dateModified" datetime="2023-02-08T17:18:54+08:00">2023-02-08</time>
               </span>
             <span class="post-meta-item">
               <span class="post-meta-item-icon">
@@ -255,7 +255,7 @@
 </li>
 </ul>
 <p>SQL 篩選各種資料時，最基本操作就是某種準備替資料分組。其實除了使用 SQL 之外，日常生活中整理資料、查詢資料時，替資料建群組。</p>
-<p>而在 SQL 中具有建立群組功能就是 GROUP BY 跟 PARTITION BY。這兩種方式都能利用資料表指定的 KEY 來分割資料，而兩者不同地方在於GROUP BY會再分割後，將資料彙整為一列，而 PARTITION BY 是將每一欄位取出整理。</p>
+<p>而在 SQL 中具有建立群組功能就是 GROUP BY 跟 PARTITION BY。這兩種方式都能利用資料表指定的 KEY 來分割資料，而兩者不同地方在於 GROUP BY 會再分割後，將資料彙整為一列，而 PARTITION BY 是將每一欄位取出整理。</p>
 <p>透過下列團隊成員資料表說明兩者差異。</p>
 <p>Teams</p>
 <table>
@@ -413,7 +413,7 @@
 <td>4</td>
 </tr>
 </tbody></table>
-<p>根據書中 286 頁圖片，使用圖形代表集合，是為了呈現分割，經過仔細觀察後發現</p>
+<p>根據書中 286頁圖片，使用圖形代表集合，是為了呈現分割，經過仔細觀察後發現</p>
 <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">每一個都不是空集合</span><br><span class="line">部分集合總和等於分割前的集合</span><br><span class="line">隨機從中挑選兩個集合出來，不會有共通得部分。</span><br></pre></td></tr></table></figure>
 <p>由於部分集合本來就是從資料表分割而來，所以不會有空集合，且部分集合的總和當然會是分割之的母體集合，所以不會有成員因為分割而失蹤。此外也不會有同時屬於兩個部分集合的成員。每一位成員必然隸屬一個集合。也就是說 GROUP BY 與 PARTITION BY 可將各成員分割至團隊得函數。</p>
 <h4 id="結論"><a href="#結論" class="headerlink" title="結論"></a>結論</h4><p>SQL 與 RDB 採用許多集合論以及群的成果，或許內容有點抽象，但也因為抽象內容，所以才廣泛應用。</p>
