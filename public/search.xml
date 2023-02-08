@@ -1,6 +1,190 @@
 <?xml version="1.0" encoding="utf-8"?>
 <search>
   <entry>
+    <title>SQL 達人的工作現場攻略筆記 - CH-18 GROUP BY 與 PARTITION BY</title>
+    <url>/2021/01/17/sql/202101172100/</url>
+    <content><![CDATA[<h4 id="大家了解兩者的差異嗎"><a href="#大家了解兩者的差異嗎" class="headerlink" title="大家了解兩者的差異嗎?"></a>大家了解兩者的差異嗎?</h4><ul>
+<li><p>group by: 對檢索結果的保留行進行單純分組，返回聚合之後的組的數據統計值的記錄。劃分為多組，每組返回一行。</p>
+</li>
+<li><p>partition by: 返回分組裡的每一條數據，在應用關聯的視窗函數前確定行集的分區和排序，然後，視窗函數將計算每一行的值。</p>
+</li>
+</ul>
+<p>SQL 篩選各種資料時，最基本操作就是某種準備替資料分組。其實除了使用 SQL 之外，日常生活中整理資料、查詢資料時，替資料建群組。</p>
+<p>而在 SQL 中具有建立群組功能就是 GROUP BY 跟 PARTITION BY。這兩種方式都能利用資料表指定的 KEY 來分割資料，而兩者不同地方在於GROUP BY會再分割後，將資料彙整為一列，而 PARTITION BY 是將每一欄位取出整理。</p>
+<p>透過下列團隊成員資料表說明兩者差異。</p>
+<p>Teams</p>
+<table>
+<thead>
+<tr>
+<th>member</th>
+<th>team</th>
+<th>age</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>郁文</td>
+<td>A</td>
+<td>28</td>
+</tr>
+<tr>
+<td>瑋乃</td>
+<td>A</td>
+<td>19</td>
+</tr>
+<tr>
+<td>銘仁</td>
+<td>A</td>
+<td>23</td>
+</tr>
+<tr>
+<td>靚儀</td>
+<td>B</td>
+<td>40</td>
+</tr>
+<tr>
+<td>勝朋</td>
+<td>B</td>
+<td>29</td>
+</tr>
+<tr>
+<td>美美</td>
+<td>C</td>
+<td>30</td>
+</tr>
+<tr>
+<td>建國</td>
+<td>D</td>
+<td>28</td>
+</tr>
+<tr>
+<td>崇恩</td>
+<td>D</td>
+<td>28</td>
+</tr>
+<tr>
+<td>連雅</td>
+<td>D</td>
+<td>24</td>
+</tr>
+<tr>
+<td>光城</td>
+<td>D</td>
+<td>22</td>
+</tr>
+</tbody></table>
+<p>若以 GROUP BY 與 PARTITION BY 處理這張資料表，可寫出取得團隊資訊的查詢。不管使用哪個陳述句，Teams 資料表都會先分割部分集合，再以SUM函數彙整或 RANK 排出順位。</p>
+<figure class="highlight sql"><table><tr><td class="code"><pre><span class="line"><span class="keyword">SELECT</span> <span class="keyword">member</span>,team,age,</span><br><span class="line"><span class="keyword">RANK</span>() <span class="keyword">OVER</span>(<span class="keyword">PARTITION</span> <span class="keyword">BY</span> team <span class="keyword">ORDER</span> <span class="keyword">BY</span> age <span class="keyword">DESC</span>) rn,</span><br><span class="line"><span class="keyword">DENSE_RANK</span>()  <span class="keyword">OVER</span>(<span class="keyword">PARTITION</span> <span class="keyword">BY</span> team <span class="keyword">ORDER</span> <span class="keyword">BY</span> age <span class="keyword">DESC</span>) dense_rn,</span><br><span class="line">ROW_NUMBER()  <span class="keyword">OVER</span>(<span class="keyword">PARTITION</span> <span class="keyword">BY</span> team <span class="keyword">ORDER</span> <span class="keyword">BY</span> age <span class="keyword">DESC</span>) row_num</span><br><span class="line"><span class="keyword">FROM</span> Teams</span><br><span class="line"><span class="keyword">ORDER</span> <span class="keyword">BY</span> team, rn</span><br></pre></td></tr></table></figure>
+
+<p>結果:</p>
+<table>
+<thead>
+<tr>
+<th>member</th>
+<th>team</th>
+<th>age</th>
+<th>rn</th>
+<th>dense_rn</th>
+<th>row_num</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>郁文</td>
+<td>A</td>
+<td>28</td>
+<td>1</td>
+<td>1</td>
+<td>1</td>
+</tr>
+<tr>
+<td>銘仁</td>
+<td>A</td>
+<td>23</td>
+<td>2</td>
+<td>2</td>
+<td>2</td>
+</tr>
+<tr>
+<td>瑋乃</td>
+<td>A</td>
+<td>19</td>
+<td>3</td>
+<td>3</td>
+<td>3</td>
+</tr>
+<tr>
+<td>靚儀</td>
+<td>B</td>
+<td>40</td>
+<td>1</td>
+<td>1</td>
+<td>1</td>
+</tr>
+<tr>
+<td>勝朋</td>
+<td>B</td>
+<td>29</td>
+<td>2</td>
+<td>2</td>
+<td>2</td>
+</tr>
+<tr>
+<td>美美</td>
+<td>C</td>
+<td>30</td>
+<td>1</td>
+<td>1</td>
+<td>1</td>
+</tr>
+<tr>
+<td>建國</td>
+<td>D</td>
+<td>28</td>
+<td>1</td>
+<td>1</td>
+<td>1</td>
+</tr>
+<tr>
+<td>崇恩</td>
+<td>D</td>
+<td>28</td>
+<td>1</td>
+<td>1</td>
+<td>2</td>
+</tr>
+<tr>
+<td>連雅</td>
+<td>D</td>
+<td>24</td>
+<td>3</td>
+<td>2</td>
+<td>3</td>
+</tr>
+<tr>
+<td>光城</td>
+<td>D</td>
+<td>22</td>
+<td>4</td>
+<td>3</td>
+<td>4</td>
+</tr>
+</tbody></table>
+<p>根據書中 286 頁圖片，使用圖形代表集合，是為了呈現分割，經過仔細觀察後發現</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">每一個都不是空集合</span><br><span class="line">部分集合總和等於分割前的集合</span><br><span class="line">隨機從中挑選兩個集合出來，不會有共通得部分。</span><br></pre></td></tr></table></figure>
+<p>由於部分集合本來就是從資料表分割而來，所以不會有空集合，且部分集合的總和當然會是分割之的母體集合，所以不會有成員因為分割而失蹤。此外也不會有同時屬於兩個部分集合的成員。每一位成員必然隸屬一個集合。也就是說 GROUP BY 與 PARTITION BY 可將各成員分割至團隊得函數。</p>
+<h4 id="結論"><a href="#結論" class="headerlink" title="結論"></a>結論</h4><p>SQL 與 RDB 採用許多集合論以及群的成果，或許內容有點抽象，但也因為抽象內容，所以才廣泛應用。</p>
+<p>參考資料: </p>
+<ol>
+<li>SQL 達人的工作現場攻略筆記</li>
+</ol>
+]]></content>
+      <categories>
+        <category>資料庫</category>
+      </categories>
+      <tags>
+        <tag>資料庫</tag>
+      </tags>
+  </entry>
+  <entry>
     <title>SQL 達人的工作現場攻略筆記 - CH-3 自我連結使用方式</title>
     <url>/2020/11/17/sql/202011172350/</url>
     <content><![CDATA[<h4 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h4><p>SQL 提供連結會依照特徵命名，分別為 <strong>內部連結</strong>、<strong>外部連結</strong>、<strong>交叉連結</strong> 這些，且這些連結通常會以不同的資料表為對象，但 SQL 並未禁止同一張表用連結，此時在同一張資料表套用連結稱為 <strong>自我連結 self join</strong>。</p>
@@ -621,190 +805,6 @@
 </li>
 <li><p><a href="https://ithelp.ithome.com.tw/articles/10221971">https://ithelp.ithome.com.tw/articles/10221971</a></p>
 </li>
-</ol>
-]]></content>
-      <categories>
-        <category>資料庫</category>
-      </categories>
-      <tags>
-        <tag>資料庫</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>SQL 達人的工作現場攻略筆記 - CH-18 GROUP BY 與 PARTITION BY</title>
-    <url>/2021/01/17/sql/202101172100/</url>
-    <content><![CDATA[<h4 id="大家了解兩者的差異嗎"><a href="#大家了解兩者的差異嗎" class="headerlink" title="大家了解兩者的差異嗎?"></a>大家了解兩者的差異嗎?</h4><ul>
-<li><p>group by: 對檢索結果的保留行進行單純分組，返回聚合之後的組的數據統計值的記錄。劃分為多組，每組返回一行。</p>
-</li>
-<li><p>partition by: 返回分組裡的每一條數據，在應用關聯的視窗函數前確定行集的分區和排序，然後，視窗函數將計算每一行的值。</p>
-</li>
-</ul>
-<p>SQL 篩選各種資料時，最基本操作就是某種準備替資料分組。其實除了使用 SQL 之外，日常生活中整理資料、查詢資料時，替資料建群組。</p>
-<p>而在 SQL 中具有建立群組功能就是 GROUP BY 跟 PARTITION BY。這兩種方式都能利用資料表指定的 KEY 來分割資料，而兩者不同地方在於GROUP BY會再分割後，將資料彙整為一列，而 PARTITION BY 是將每一欄位取出整理。</p>
-<p>透過下列團隊成員資料表說明兩者差異。</p>
-<p>Teams</p>
-<table>
-<thead>
-<tr>
-<th>member</th>
-<th>team</th>
-<th>age</th>
-</tr>
-</thead>
-<tbody><tr>
-<td>郁文</td>
-<td>A</td>
-<td>28</td>
-</tr>
-<tr>
-<td>瑋乃</td>
-<td>A</td>
-<td>19</td>
-</tr>
-<tr>
-<td>銘仁</td>
-<td>A</td>
-<td>23</td>
-</tr>
-<tr>
-<td>靚儀</td>
-<td>B</td>
-<td>40</td>
-</tr>
-<tr>
-<td>勝朋</td>
-<td>B</td>
-<td>29</td>
-</tr>
-<tr>
-<td>美美</td>
-<td>C</td>
-<td>30</td>
-</tr>
-<tr>
-<td>建國</td>
-<td>D</td>
-<td>28</td>
-</tr>
-<tr>
-<td>崇恩</td>
-<td>D</td>
-<td>28</td>
-</tr>
-<tr>
-<td>連雅</td>
-<td>D</td>
-<td>24</td>
-</tr>
-<tr>
-<td>光城</td>
-<td>D</td>
-<td>22</td>
-</tr>
-</tbody></table>
-<p>若以 GROUP BY 與 PARTITION BY 處理這張資料表，可寫出取得團隊資訊的查詢。不管使用哪個陳述句，Teams 資料表都會先分割部分集合，再以SUM函數彙整或 RANK 排出順位。</p>
-<figure class="highlight sql"><table><tr><td class="code"><pre><span class="line"><span class="keyword">SELECT</span> <span class="keyword">member</span>,team,age,</span><br><span class="line"><span class="keyword">RANK</span>() <span class="keyword">OVER</span>(<span class="keyword">PARTITION</span> <span class="keyword">BY</span> team <span class="keyword">ORDER</span> <span class="keyword">BY</span> age <span class="keyword">DESC</span>) rn,</span><br><span class="line"><span class="keyword">DENSE_RANK</span>()  <span class="keyword">OVER</span>(<span class="keyword">PARTITION</span> <span class="keyword">BY</span> team <span class="keyword">ORDER</span> <span class="keyword">BY</span> age <span class="keyword">DESC</span>) dense_rn,</span><br><span class="line">ROW_NUMBER()  <span class="keyword">OVER</span>(<span class="keyword">PARTITION</span> <span class="keyword">BY</span> team <span class="keyword">ORDER</span> <span class="keyword">BY</span> age <span class="keyword">DESC</span>) row_num</span><br><span class="line"><span class="keyword">FROM</span> Teams</span><br><span class="line"><span class="keyword">ORDER</span> <span class="keyword">BY</span> team, rn</span><br></pre></td></tr></table></figure>
-
-<p>結果:</p>
-<table>
-<thead>
-<tr>
-<th>member</th>
-<th>team</th>
-<th>age</th>
-<th>rn</th>
-<th>dense_rn</th>
-<th>row_num</th>
-</tr>
-</thead>
-<tbody><tr>
-<td>郁文</td>
-<td>A</td>
-<td>28</td>
-<td>1</td>
-<td>1</td>
-<td>1</td>
-</tr>
-<tr>
-<td>銘仁</td>
-<td>A</td>
-<td>23</td>
-<td>2</td>
-<td>2</td>
-<td>2</td>
-</tr>
-<tr>
-<td>瑋乃</td>
-<td>A</td>
-<td>19</td>
-<td>3</td>
-<td>3</td>
-<td>3</td>
-</tr>
-<tr>
-<td>靚儀</td>
-<td>B</td>
-<td>40</td>
-<td>1</td>
-<td>1</td>
-<td>1</td>
-</tr>
-<tr>
-<td>勝朋</td>
-<td>B</td>
-<td>29</td>
-<td>2</td>
-<td>2</td>
-<td>2</td>
-</tr>
-<tr>
-<td>美美</td>
-<td>C</td>
-<td>30</td>
-<td>1</td>
-<td>1</td>
-<td>1</td>
-</tr>
-<tr>
-<td>建國</td>
-<td>D</td>
-<td>28</td>
-<td>1</td>
-<td>1</td>
-<td>1</td>
-</tr>
-<tr>
-<td>崇恩</td>
-<td>D</td>
-<td>28</td>
-<td>1</td>
-<td>1</td>
-<td>2</td>
-</tr>
-<tr>
-<td>連雅</td>
-<td>D</td>
-<td>24</td>
-<td>3</td>
-<td>2</td>
-<td>3</td>
-</tr>
-<tr>
-<td>光城</td>
-<td>D</td>
-<td>22</td>
-<td>4</td>
-<td>3</td>
-<td>4</td>
-</tr>
-</tbody></table>
-<p>根據書中 286 頁圖片，使用圖形代表集合，是為了呈現分割，經過仔細觀察後發現</p>
-<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">每一個都不是空集合</span><br><span class="line">部分集合總和等於分割前的集合</span><br><span class="line">隨機從中挑選兩個集合出來，不會有共通得部分。</span><br></pre></td></tr></table></figure>
-<p>由於部分集合本來就是從資料表分割而來，所以不會有空集合，且部分集合的總和當然會是分割之的母體集合，所以不會有成員因為分割而失蹤。此外也不會有同時屬於兩個部分集合的成員。每一位成員必然隸屬一個集合。也就是說 GROUP BY 與 PARTITION BY 可將各成員分割至團隊得函數。</p>
-<h4 id="結論"><a href="#結論" class="headerlink" title="結論"></a>結論</h4><p>SQL 與 RDB 採用許多集合論以及群的成果，或許內容有點抽象，但也因為抽象內容，所以才廣泛應用。</p>
-<p>參考資料: </p>
-<ol>
-<li>SQL 達人的工作現場攻略筆記</li>
 </ol>
 ]]></content>
       <categories>
